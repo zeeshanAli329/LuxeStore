@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { COMPANY_NAME, ALT, LOGO } from "@/app/constants/names";
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,8 +20,8 @@ export default function Navbar() {
                 <div className="flex justify-between items-center h-20">
                     {/* Logo */}
                     <div className="flex-shrink-0 flex items-center">
-                        <Link href="/" className="text-2xl font-bold text-gray-900 tracking-tight hover:opacity-80 transition-opacity">
-                            Luxe<span className="text-blue-600">Store</span>.
+                        <Link href="/" className="text-2xl font-bold text-gray-900 tracking-tight  transition-opacity">
+                            <img className="h-15  bg-transparent" src={LOGO} alt={ALT}></img>
                         </Link>
                     </div>
 
@@ -76,18 +77,18 @@ export default function Navbar() {
                             )}
                         </div>
 
-                        <button className="text-gray-500 hover:text-blue-600 transition-colors transform hover:scale-110">
+                        <Link href={"/favorite-items"} className="text-gray-500 hover:text-blue-600 transition-colors transform hover:scale-110">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
-                        </button>
-
-                        <button className="text-gray-500 hover:text-blue-600 transition-colors relative transform hover:scale-110">
+                        </Link>
+                        {/* ----------------------cart--------------- */}
+                        <Link href={"/cart"} className="text-gray-500 hover:text-blue-600 transition-colors relative transform hover:scale-110">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                             </svg>
                             <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center shadow-sm">2</span>
-                        </button>
+                        </Link>
 
                         <button className="text-gray-500 hover:text-blue-600 transition-colors transform hover:scale-110">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

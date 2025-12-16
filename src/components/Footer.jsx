@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { COMPANY_NAME, LOGO, ALT } from "@/app/constants/names";
+
+
 
 export default function Footer() {
     return (
@@ -7,9 +10,9 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
                     {/* Brand Column */}
                     <div>
-                        <Link href="/" className="text-2xl font-bold tracking-tight mb-6 block">
-                            Luxe<span className="text-blue-400">Store</span>.
-                        </Link>
+                        {/* <Link href="/" className=" mb-10 ">
+                            <img className="h-15 bg-white mb-10" src={LOGO} alt={ALT}></img>
+                        </Link> */}
                         <p className="text-gray-400 mb-6 leading-relaxed">
                             Your one-stop destination for premium fashion, electronics, and lifestyle products.
                             Quality meets elegance.
