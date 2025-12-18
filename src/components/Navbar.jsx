@@ -3,11 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 import { COMPANY_NAME, ALT, LOGO } from "@/app/constants/names";
+import { useStore } from "@/store";
+
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const { cart } = useStore();
+    const cartCount = cart.reduce((total, item) => total + item.qty, 0);
+
+
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
@@ -87,7 +93,12 @@ export default function Navbar() {
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                             </svg>
-                            <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center shadow-sm">2</span>
+                            {cartCount > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center shadow-sm">
+                                    {cartCount}
+                                </span>
+                            )}
+
                         </Link>
 
                         <button className="text-gray-500 hover:text-blue-600 transition-colors transform hover:scale-110">

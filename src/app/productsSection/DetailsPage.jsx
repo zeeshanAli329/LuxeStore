@@ -2,12 +2,29 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useStore } from "@/store";
+
 
 export default function DetailsPage({ id }) {
     const [product, setProduct] = useState(null);
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { addToCart } = useStore();
+    const router = useRouter();
+
+    const handleAddToCart = () => {
+        addToCart({
+            id: product.id,
+            title: product.title,
+            price: product.price,
+            image: product.image,
+        });
+
+        router.push("/cart");
+    };
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -111,9 +128,13 @@ export default function DetailsPage({ id }) {
                             </p>
 
                             <div className="flex gap-4">
-                                <button className="flex-1 bg-gray-900 text-white px-8 py-4 cursor-pointer rounded-xl font-semibold text-lg hover:bg-gray-800 transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-xl">
+                                <button
+                                    onClick={handleAddToCart}
+                                    className="flex-1 bg-gray-900 text-white px-8 py-4 cursor-pointer rounded-xl font-semibold text-lg hover:bg-gray-800 transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
+                                >
                                     Add to Cart
                                 </button>
+
                                 <button className="px-4 py-4 rounded-xl border-2 border-gray-200 cursor-pointer hover:border-gray-900 transition-colors">
                                     <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
