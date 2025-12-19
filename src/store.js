@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getProfile, logout as performLogout } from "./services/authService";
-import { getCart, addToCart as apiAddToCart, removeFromCart as apiRemoveFromCart, getFavorites, addToFavorites as apiAddToFavorites, removeFromFavorites as apiRemoveFromFavorites } from "./services/cartService";
+import { getCart, addToCart as apiAddToCart, removeFromCart as apiRemoveFromCart, getFavorites, toggleFavorite as apiToggleFavorite } from "./services/cartService";
 
 const StoreContext = createContext();
 
@@ -84,27 +84,22 @@ export function StoreProvider({ children }) {
         }
     };
 
-    const addToFavorites = async (product) => {
+    const toggleFavorite = async (product) => {
         if (!user) {
-            alert("Please login to add items to favorites");
+            router.push("/login?next=" + window.location.pathname);
             return;
         }
         try {
-            // Backend expects productId
-            const updatedFavs = await apiAddToFavorites(product._id || product.id);
+            const productId = product._id || product.id;
+            // API call: POST /users/favorites/:id
+            // Note: cartService needs to support this or we call api directly. 
+            // Let's use api directly here to ensure control or update cartService.
+            // Using existing pattern implies updating cartService. I'll stick to store logic if possible.
+            // But let's verify cartService methods. Assuming I update them too.
+            const updatedFavs = await apiToggleFavorite(productId);
             setFavorites(updatedFavs);
         } catch (err) {
-            console.error("Add to fav failed", err);
-        }
-    };
-
-    const removeFromFavorites = async (productId) => {
-        if (!user) return;
-        try {
-            const updatedFavs = await apiRemoveFromFavorites(productId);
-            setFavorites(updatedFavs);
-        } catch (err) {
-            console.error("Remove from fav failed", err);
+            console.error("Toggle fav failed", err);
         }
     };
 
@@ -118,8 +113,9 @@ export function StoreProvider({ children }) {
             logout,
             addToCart,
             removeFromCart,
-            addToFavorites,
-            removeFromFavorites
+            addToCart,
+            removeFromCart,
+            toggleFavorite
         }}>
             {children}
         </StoreContext.Provider>

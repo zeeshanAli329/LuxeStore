@@ -39,6 +39,9 @@ const productSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        images: [String], // Array of additional image URLs
+        colors: [String], // Array of available colors
+        sizes: [String],  // Array of available sizes (String to handle "42", "XL", etc.)
     },
     { timestamps: true }
 );

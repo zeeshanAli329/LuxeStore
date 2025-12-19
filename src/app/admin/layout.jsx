@@ -58,6 +58,7 @@ export default function AdminLayout({ children }) {
                     <NavLink href="/admin/products" label="Products" />
                     <NavLink href="/admin/orders" label="Orders" />
                     <NavLink href="/admin/users" label="Users" />
+                    <NavLink href="/admin/settings" label="Settings" />
 
                     <div className="pt-4 mt-4 border-t border-gray-100">
                         <Link href="/" className="flex items-center space-x-3 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">

@@ -4,17 +4,26 @@ const Product = require("../models/Product");
 exports.getProducts = async (req, res) => {
     try {
         // Simple search & filter
-        const { keyword, category } = req.query;
+        const { keyword, category, featured, limit } = req.query;
         let query = {};
 
         if (keyword) {
             query.title = { $regex: keyword, $options: "i" };
         }
-        if (category) {
+        if (category && category !== 'All' && category !== '') {
             query.category = category;
         }
+        if (featured === 'true') {
+            query.isFeatured = true;
+        }
 
-        const products = await Product.find(query);
+        let productsQuery = Product.find(query);
+
+        if (limit) {
+            productsQuery = productsQuery.limit(Number(limit));
+        }
+
+        const products = await productsQuery.sort({ createdAt: -1 });
         res.json(products);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -37,7 +46,7 @@ exports.getProductById = async (req, res) => {
 // CREATE PRODUCT (ADMIN)
 exports.createProduct = async (req, res) => {
     try {
-        const { title, description, image, oldPrice, newPrice, discount, category, stock, isFeatured } = req.body;
+        const { title, description, image, images, oldPrice, newPrice, discount, category, stock, isFeatured, colors, sizes } = req.body;
 
         // Calculate discount if not provided but old/new prices are
         let finalDiscount = discount;
@@ -49,12 +58,15 @@ exports.createProduct = async (req, res) => {
             title,
             description,
             image,
+            images: images || [],
             oldPrice,
             newPrice,
             discount: finalDiscount || 0,
             category,
             stock,
             isFeatured,
+            colors: colors || [],
+            sizes: sizes || []
         });
 
         res.status(201).json(product);
@@ -74,12 +86,15 @@ exports.updateProduct = async (req, res) => {
         product.title = req.body.title || product.title;
         product.description = req.body.description || product.description;
         product.image = req.body.image || product.image;
+        product.images = req.body.images || product.images; // Array replacement
         product.oldPrice = req.body.oldPrice || product.oldPrice;
         product.newPrice = req.body.newPrice || product.newPrice;
         product.discount = req.body.discount || product.discount;
         product.category = req.body.category || product.category;
         product.stock = req.body.stock || product.stock;
         product.isFeatured = req.body.isFeatured !== undefined ? req.body.isFeatured : product.isFeatured;
+        product.colors = req.body.colors || product.colors;
+        product.sizes = req.body.sizes || product.sizes;
 
         // Recalculate discount if prices changed
         if (req.body.oldPrice || req.body.newPrice) {

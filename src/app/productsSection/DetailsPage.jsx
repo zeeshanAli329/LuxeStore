@@ -11,7 +11,8 @@ export default function DetailsPage({ id }) {
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { addToCart, addToFavorites } = useStore();
+    const { addToCart, favorites, toggleFavorite, user } = useStore();
+    const isFavorite = favorites.some(fav => (fav._id || fav) === (product?._id || product?.id));
     const router = useRouter();
 
     const handleAddToCart = () => {
@@ -20,10 +21,7 @@ export default function DetailsPage({ id }) {
         router.push("/cart");
     };
 
-    const handleAddToFavorites = () => {
-        if (!product) return;
-        addToFavorites(product);
-    };
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -125,7 +123,7 @@ export default function DetailsPage({ id }) {
                                 {product.description}
                             </p>
 
-                            <div className="flex gap-4">
+                            <div className="flex gap-4 flex-col sm:flex-row">
                                 <button
                                     onClick={handleAddToCart}
                                     className="flex-1 bg-gray-900 text-white px-8 py-4 cursor-pointer rounded-xl font-semibold text-lg hover:bg-gray-800 transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
@@ -134,10 +132,24 @@ export default function DetailsPage({ id }) {
                                 </button>
 
                                 <button
-                                    onClick={handleAddToFavorites}
-                                    className="px-4 py-4 rounded-xl border-2 border-gray-200 cursor-pointer hover:border-gray-900 transition-colors"
+                                    onClick={() => {
+                                        if (!product) return;
+                                        // Redirect to Guest Checkout / Buy Now page
+                                        router.push(`/buy-now?productId=${product._id || product.id}&qty=1`);
+                                    }}
+                                    className="flex-1 bg-blue-600 text-white px-8 py-4 cursor-pointer rounded-xl font-semibold text-lg hover:bg-blue-700 transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
                                 >
-                                    <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    Buy Now
+                                </button>
+
+                                <button
+                                    onClick={() => toggleFavorite(product)}
+                                    className={`px-4 py-4 rounded-xl border-2 transition-all flex items-center justify-center cursor-pointer ${isFavorite
+                                            ? 'border-red-500 bg-red-50 text-red-500 hover:bg-red-100'
+                                            : 'border-gray-200 text-gray-400 hover:border-red-500 hover:text-red-500'
+                                        }`}
+                                >
+                                    <svg className={`w-6 h-6 ${isFavorite ? 'fill-current' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                     </svg>
                                 </button>

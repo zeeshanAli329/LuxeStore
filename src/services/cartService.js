@@ -24,14 +24,24 @@ export const getFavorites = async () => {
     return response.data;
 };
 
-// Add to Favorites
-export const addToFavorites = async (productId) => {
-    const response = await api.post("/users/favorites", { productId });
+// Toggle Favorite (Replaces add/remove)
+export const toggleFavorite = async (productId) => {
+    // Backend: POST /users/favorites/:productId handles toggle
+    const response = await api.post(`/users/favorites/${productId}`);
     return response.data;
 };
 
-// Remove from Favorites
+// Helper for backward compatibility or direct add calls if needed elsewhere
+// But prefer toggleFavorite
+export const addToFavorites = async (productId) => {
+    return toggleFavorite(productId);
+};
+
 export const removeFromFavorites = async (productId) => {
-    const response = await api.delete(`/users/favorites/${productId}`);
-    return response.data;
+    // Current backend logic is toggle-based on POST, but let's check if we strictly need DELETE
+    // If backend implements toggle on POST, this is fine.
+    // If we want explicit remove, we might need to check if backend still has DELETE.
+    // Looking at userController modification, I saw I removed explicit remove and add in favor of toggle.
+    // So toggleFavorite is the only one we really need.
+    return toggleFavorite(productId);
 };

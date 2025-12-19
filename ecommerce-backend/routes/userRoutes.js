@@ -3,12 +3,12 @@ const {
     registerUser,
     loginUser,
     getProfile,
+    updateUserProfile,
     getCart,
     addToCart,
     removeFromCart,
     getFavorites,
-    addToFavorites,
-    removeFromFavorites,
+    toggleFavorite,
     getAllUsers, // New controller
 } = require("../controllers/userController");
 const { protect, admin } = require("../middleware/authMiddleware");
@@ -21,6 +21,7 @@ router.get("/", protect, admin, getAllUsers);
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/profile", protect, getProfile);
+router.put("/profile", protect, updateUserProfile);
 
 // Cart Routes
 router.get("/cart", protect, getCart);
@@ -29,7 +30,6 @@ router.delete("/cart/:productId", protect, removeFromCart);
 
 // Favorites Routes
 router.get("/favorites", protect, getFavorites);
-router.post("/favorites", protect, addToFavorites);
-router.delete("/favorites/:productId", protect, removeFromFavorites);
+router.post("/favorites/:productId", protect, toggleFavorite);
 
 module.exports = router;

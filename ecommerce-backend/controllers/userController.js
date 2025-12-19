@@ -77,6 +77,35 @@ exports.getProfile = async (req, res) => {
   }
 };
 
+// UPDATE USER PROFILE
+exports.updateUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      user.name = req.body.name || user.name;
+      if (req.body.password) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(req.body.password, salt);
+      }
+
+      const updatedUser = await user.save();
+
+      res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        token: req.headers.authorization?.split(" ")[1] // Return existing token or handle re-issue if needed foundationally
+      });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // CART OPERATIONS
 exports.getCart = async (req, res) => {
   try {
@@ -136,29 +165,20 @@ exports.getFavorites = async (req, res) => {
   }
 };
 
-exports.addToFavorites = async (req, res) => {
-  try {
-    const { productId } = req.body;
-    const user = await User.findById(req.user._id);
-
-    if (!user.favorites.includes(productId)) {
-      user.favorites.push(productId);
-      await user.save();
-    }
-
-    const updatedUser = await User.findById(req.user._id).populate("favorites");
-    res.json(updatedUser.favorites);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-exports.removeFromFavorites = async (req, res) => {
+exports.toggleFavorite = async (req, res) => {
   try {
     const { productId } = req.params;
     const user = await User.findById(req.user._id);
 
-    user.favorites = user.favorites.filter(id => id.toString() !== productId);
+    const isFav = user.favorites.some(id => id.toString() === productId);
+
+    if (isFav) {
+      // Remove
+      user.favorites = user.favorites.filter(id => id.toString() !== productId);
+    } else {
+      // Add
+      user.favorites.push(productId);
+    }
 
     await user.save();
     const updatedUser = await User.findById(req.user._id).populate("favorites");

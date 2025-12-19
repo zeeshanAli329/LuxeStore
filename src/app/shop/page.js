@@ -1,144 +1,102 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import api from "../../utils/api";
 import Link from "next/link";
-import { getProducts } from "../../services/productService";
+import { useSearchParams } from "next/navigation";
+import { formatPKR } from "@/utils/currency";
 
 export default function ShopPage() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedCategory, setSelectedCategory] = useState("All");
-    const [priceRange, setPriceRange] = useState(1000);
+    const searchParams = useSearchParams();
+    const categoryParam = searchParams.get("category");
+    const [selectedCategory, setSelectedCategory] = useState(categoryParam || "All");
 
     useEffect(() => {
-        getProducts()
-            .then(data => {
-                setProducts(data);
+        if (categoryParam) setSelectedCategory(categoryParam);
+    }, [categoryParam]);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            setLoading(true);
+            try {
+                const res = await api.get("/products");
+                setProducts(res.data);
+            } catch (error) {
+                console.error("Fetch shop products failed", error);
+            } finally {
                 setLoading(false);
-            })
-            .catch(err => {
-                console.error(err);
-                setLoading(false);
-            });
+            }
+        };
+        fetchProducts();
     }, []);
 
-    const categories = ["All", "men's clothing", "women's clothing", "electronics", "jewelery"];
+    const categories = ["All", ...new Set(products.map(p => p.category).filter(Boolean))];
 
-    const filteredProducts = products.filter(product => {
-        const categoryMatch = selectedCategory === "All" || product.category === selectedCategory;
-        const priceMatch = product.price <= priceRange;
-        return categoryMatch && priceMatch;
-    });
+    const filteredProducts = selectedCategory === "All"
+        ? products
+        : products.filter(p => p.category === selectedCategory);
+
+    if (loading) return <div className="min-h-screen pt-20 text-center">Loading shop...</div>;
 
     return (
-        <div className="min-h-screen bg-[#f5f5f5] py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
-                <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Sidebar Filters */}
-                    <aside className="w-full lg:w-64 flex-shrink-0">
-                        <div className="bg-white p-6 rounded-xl shadow-sm sticky top-24">
-                            <h3 className="text-lg font-bold text-gray-900 mb-6">Filters</h3>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">Shop All Products</h1>
 
-                            {/* Categories */}
-                            <div className="mb-8">
-                                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Categories</h4>
-                                <div className="space-y-2">
-                                    {categories.map(cat => (
-                                        <label key={cat} className="flex items-center cursor-pointer group">
-                                            <input
-                                                type="radio"
-                                                name="category"
-                                                className="form-radio text-blue-600 focus:ring-blue-500 h-4 w-4"
-                                                checked={selectedCategory === cat}
-                                                onChange={() => setSelectedCategory(cat)}
-                                            />
-                                            <span className="ml-3 text-gray-600 group-hover:text-blue-600 capitalize transition-colors">{cat}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
+            <div className="flex flex-col md:flex-row gap-8">
+                {/* Sidebar Filters */}
+                <div className="w-full md:w-64 flex-shrink-0">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4">Categories</h3>
+                    <div className="space-y-2">
+                        {categories.map(cat => (
+                            <button
+                                key={cat}
+                                onClick={() => setSelectedCategory(cat)}
+                                className={`block w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${selectedCategory === cat
+                                    ? "bg-gray-900 text-white"
+                                    : "text-gray-600 hover:bg-gray-100"
+                                    }`}
+                            >
+                                <span className="capitalize">{cat}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
-                            {/* Price Range */}
-                            <div>
-                                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Price Range</h4>
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="1000"
-                                    value={priceRange}
-                                    onChange={(e) => setPriceRange(Number(e.target.value))}
-                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                                />
-                                <div className="flex justify-between mt-2 text-sm text-gray-600">
-                                    <span>$0</span>
-                                    <span className="font-medium text-gray-900">${priceRange}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </aside>
-
-                    {/* Product Grid */}
-                    <div className="flex-1">
-                        <div className="mb-6 flex justify-between items-center">
-                            <h1 className="text-2xl font-bold text-gray-900">Shop All Products</h1>
-                            <span className="text-gray-500">{filteredProducts.length} results</span>
-                        </div>
-
-                        {loading ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {[...Array(6)].map((_, i) => (
-                                    <div key={i} className="bg-white rounded-xl h-96 animate-pulse"></div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {filteredProducts.map((item) => (
-                                    <div
-                                        key={item._id}
-                                        className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-[1.02] p-4 flex flex-col h-full border border-gray-100 group relative"
-                                    >
-                                        {item.discount > 0 && (
-                                            <span className="absolute top-4 left-4 z-10 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                                                -{item.discount}%
+                {/* Product Grid */}
+                <div className="flex-1">
+                    {filteredProducts.length === 0 ? (
+                        <div className="text-center py-20 text-gray-500">No products found in this category.</div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {filteredProducts.map(product => (
+                                <Link key={product._id} href={`/product/${product._id}`} className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow">
+                                    <div className="aspect-w-1 aspect-h-1 bg-gray-200 h-64 relative">
+                                        <img
+                                            src={product.image || "https://placehold.co/400"}
+                                            alt={product.title}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        />
+                                        {product.discount > 0 && (
+                                            <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                                                -{product.discount}%
                                             </span>
                                         )}
-                                        <div className="relative h-48 w-full mb-4 flex items-center justify-center overflow-hidden bg-white rounded-lg">
-                                            <img
-                                                src={item.image || "/placeholder.png"}
-                                                alt={item.title}
-                                                className="object-contain h-full w-full max-h-40 group-hover:scale-105 transition-transform duration-300"
-                                            />
-                                        </div>
-
-                                        <div className="flex flex-col flex-grow">
-                                            <p className="text-xs text-gray-500 uppercase mb-1">{item.category}</p>
-                                            <h3 className="text-sm font-bold text-gray-900 leading-snug mb-2 line-clamp-2" title={item.title}>
-                                                {item.title}
-                                            </h3>
-
-                                            <div className="mt-auto pt-3 border-t border-gray-50 flex items-center justify-between">
-                                                <div className="flex flex-col">
-                                                    <span className="text-lg font-bold text-gray-900">
-                                                        ${item.newPrice?.toFixed(2) || item.price?.toFixed(2) || "0.00"}
-                                                    </span>
-                                                    {item.oldPrice && item.oldPrice > item.newPrice && (
-                                                        <span className="text-xs text-gray-400 line-through">
-                                                            ${item.oldPrice.toFixed(2)}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <Link href={`/product/${item._id}`} className="p-2 bg-gray-100 rounded-full hover:bg-blue-600 hover:text-white transition-colors">
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                                                    </svg>
-                                                </Link>
-                                            </div>
+                                    </div>
+                                    <div className="p-4">
+                                        <p className="text-xs text-gray-500 capitalize mb-1">{product.category}</p>
+                                        <h3 className="text-sm font-bold text-gray-900 truncate mb-2">{product.title}</h3>
+                                        <div className="flex items-center space-x-2">
+                                            <span className="text-lg font-bold text-gray-900">{formatPKR(product.newPrice || product.price)}</span>
+                                            {product.oldPrice && (
+                                                <span className="text-sm text-gray-400 line-through">{formatPKR(product.oldPrice)}</span>
+                                            )}
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

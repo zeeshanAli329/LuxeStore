@@ -5,7 +5,12 @@ const orderSchema = new mongoose.Schema(
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
+            required: false, // Optional for Guest Checkout
+        },
+        guestInfo: {
+            name: { type: String },
+            email: { type: String },
+            phone: { type: String },
         },
         products: [
             {
@@ -17,6 +22,10 @@ const orderSchema = new mongoose.Schema(
                     type: Number,
                     required: true,
                 },
+                selectedColor: String,
+                selectedSize: String,
+                image: String,     // Snapshot of product image at time of order
+                unitPrice: Number, // Snapshot of price at time of order
             },
         ],
         totalAmount: {
@@ -25,12 +34,25 @@ const orderSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ["Pending", "Processing", "Shipped", "Delivered"],
+            enum: ["Pending", "Confirmed", "Shipped", "Delivered", "Cancelled"],
             default: "Pending",
         },
+        paymentMethod: {
+            type: String,
+            default: "COD",
+            enum: ["COD"], // Strictly COD for now
+        },
+        paymentStatus: {
+            type: String,
+            default: "Pending",
+            enum: ["Pending", "Paid", "Failed"],
+        },
         shippingAddress: {
-            type: Object, // Specific fields can be defined if needed
-            required: false,
+            address: { type: String, required: true },
+            city: { type: String, required: true },
+            postalCode: { type: String, required: true },
+            country: { type: String, required: true, default: "Pakistan" },
+            phone: { type: String, required: true },
         },
     },
     { timestamps: true }
