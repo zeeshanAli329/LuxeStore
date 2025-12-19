@@ -2,21 +2,24 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { getProducts } from "../../services/productService";
 
 export default function ShopPage() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState("All");
-    const [priceRange, setPriceRange] = useState(500);
+    const [priceRange, setPriceRange] = useState(1000);
 
     useEffect(() => {
-        fetch("https://fakestoreapi.com/products")
-            .then(res => res.json())
+        getProducts()
             .then(data => {
                 setProducts(data);
                 setLoading(false);
             })
-            .catch(err => setLoading(false));
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
     }, []);
 
     const categories = ["All", "men's clothing", "women's clothing", "electronics", "jewelery"];
@@ -91,12 +94,17 @@ export default function ShopPage() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {filteredProducts.map((item) => (
                                     <div
-                                        key={item.id}
-                                        className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-[1.02] p-4 flex flex-col h-full border border-gray-100 group"
+                                        key={item._id}
+                                        className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-[1.02] p-4 flex flex-col h-full border border-gray-100 group relative"
                                     >
+                                        {item.discount > 0 && (
+                                            <span className="absolute top-4 left-4 z-10 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                                -{item.discount}%
+                                            </span>
+                                        )}
                                         <div className="relative h-48 w-full mb-4 flex items-center justify-center overflow-hidden bg-white rounded-lg">
                                             <img
-                                                src={item.image}
+                                                src={item.image || "/placeholder.png"}
                                                 alt={item.title}
                                                 className="object-contain h-full w-full max-h-40 group-hover:scale-105 transition-transform duration-300"
                                             />
@@ -109,10 +117,17 @@ export default function ShopPage() {
                                             </h3>
 
                                             <div className="mt-auto pt-3 border-t border-gray-50 flex items-center justify-between">
-                                                <span className="text-lg font-bold text-gray-900">
-                                                    ${item.price.toFixed(2)}
-                                                </span>
-                                                <Link href={`/product/${item.id}`} className="p-2 bg-gray-100 rounded-full hover:bg-blue-600 hover:text-white transition-colors">
+                                                <div className="flex flex-col">
+                                                    <span className="text-lg font-bold text-gray-900">
+                                                        ${item.newPrice?.toFixed(2) || item.price?.toFixed(2) || "0.00"}
+                                                    </span>
+                                                    {item.oldPrice && item.oldPrice > item.newPrice && (
+                                                        <span className="text-xs text-gray-400 line-through">
+                                                            ${item.oldPrice.toFixed(2)}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <Link href={`/product/${item._id}`} className="p-2 bg-gray-100 rounded-full hover:bg-blue-600 hover:text-white transition-colors">
                                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                                                     </svg>
