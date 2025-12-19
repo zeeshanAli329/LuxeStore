@@ -20,15 +20,18 @@ function LoginForm() {
     try {
       const data = await apiLogin({ email, password });
 
-      // 1. Update global store synchronous-like (React state)
+      // 1. Update global store
       login(data.user, data.token);
 
       // 2. Strict Redirect Logic
-      if (next) {
-        router.replace(next);
-      } else if (data.user.role === "admin") {
-        router.replace("/admin");
+      if (data.user.role === "admin") {
+        if (next && next.startsWith("/admin")) {
+          router.replace(next);
+        } else {
+          router.replace("/admin");
+        }
       } else {
+        // Non-admin users always go to home, regardless of 'next'
         router.replace("/");
       }
     } catch (err) {

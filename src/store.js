@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useContext, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { getProfile, logout as performLogout } from "./services/authService";
 import { getCart, addToCart as apiAddToCart, removeFromCart as apiRemoveFromCart, getFavorites, addToFavorites as apiAddToFavorites, removeFromFavorites as apiRemoveFromFavorites } from "./services/cartService";
 
@@ -10,6 +11,7 @@ export function StoreProvider({ children }) {
     const [cart, setCart] = useState([]);
     const [favorites, setFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
+    const router = useRouter(); // Use router for logout
 
     // Initial Load - Check Auth
     useEffect(() => {
@@ -52,18 +54,21 @@ export function StoreProvider({ children }) {
         setUser(null);
         setCart([]);
         setFavorites([]);
-        window.location.href = "/login";
+        router.replace("/login");
     };
 
     const addToCart = async (product, quantity = 1) => {
         if (!user) {
-            // Local logic for Guest (optional: redirect to login)
-            return window.location.href = "/login";
+            // Strict rule: No navigation in providers.
+            // Component should handle redirection if needed, or we just alert here.
+            alert("Please login to add items to cart");
+            return;
         }
 
         try {
             const updatedCart = await apiAddToCart(product._id || product.id, quantity);
             setCart(updatedCart);
+            // alert("Added to cart!"); // Optional feedback
         } catch (err) {
             console.error("Add to cart failed", err);
         }
@@ -80,7 +85,10 @@ export function StoreProvider({ children }) {
     };
 
     const addToFavorites = async (product) => {
-        if (!user) return window.location.href = "/login";
+        if (!user) {
+            alert("Please login to add items to favorites");
+            return;
+        }
         try {
             // Backend expects productId
             const updatedFavs = await apiAddToFavorites(product._id || product.id);
