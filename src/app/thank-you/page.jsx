@@ -1,19 +1,18 @@
 "use client";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { formatPKR } from "@/utils/currency";
 import api from "@/utils/api";
 
-export default function ThankYouPage() {
+function ThankYouContent() {
     const searchParams = useSearchParams();
     const orderId = searchParams.get("orderId");
     const [order, setOrder] = useState(null);
 
     useEffect(() => {
         if (orderId) {
-            // Optional: Fetch order details to show total or items, but page should work without it to be resilient
-            // We can just show the ID.
+            // Optional: Fetch order details
         }
     }, [orderId]);
 
@@ -49,5 +48,13 @@ export default function ThankYouPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function ThankYouPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <ThankYouContent />
+        </Suspense>
     );
 }
