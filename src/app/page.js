@@ -116,8 +116,8 @@ function ProductCard({ product, showCategory = false }) {
   if (!product) return null;
 
   return (
-    <Link href={`/product/${product._id}`} className="group block h-full cursor-pointer bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow">
-      <div className="w-full aspect-w-1 aspect-h-1 bg-gray-200 relative">
+    <Link href={`/product/${product._id}`} className="group block h-full cursor-pointer bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow flex flex-col">
+      <div className="w-full h-64 sm:h-auto sm:aspect-w-1 sm:aspect-h-1 bg-gray-200 relative overflow-hidden">
         <img
           src={product.image}
           alt={product.title}
