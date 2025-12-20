@@ -1,33 +1,31 @@
-# How to Fix "Network Error" on Mobile
+# Mobile Setup Instructions (Fix Network Error)
 
-When testing on a phone (same Wi-Fi) or Vercel, the frontend needs to know where the backend is. `localhost` on a phone refers to the phone itself, not your PC!
+To test on your real phone, you must point the frontend to your PC's LAN IP Address, because `localhost` on your phone does not reach your PC.
 
-## 1. Find Your PC's Local IP
-1. Open Command Prompt (Terminal).
-2. Type `ipconfig` (Windows) or `ifconfig` (Mac/Linux).
-3. Look for "IPv4 Address" (e.g., `192.168.1.5`).
+## 1. Find your LAN IP
+- **Windows**: Open Terminal -> type `ipconfig` -> Look for `IPv4 Address` (e.g. `192.168.1.10`)
+- **Mac/Linux**: Open Terminal -> type `ifconfig` -> Look for `inet 192.168...`
 
-## 2. Create/Edit `.env.local` in Frontend
-Create a file named `.env.local` in `d:\Front-End Development\components\my-app\` and add:
-
+## 2. Update Frontend Config
+1. Open the file `.env.local` in `src/` (or create it if missing).
+2. Add or update this line:
 ```env
 NEXT_PUBLIC_API_BASE_URL=http://<YOUR_LAN_IP>:5000/api
 ```
-*Replace `<YOUR_LAN_IP>` with your actual IP, e.g., `http://192.168.1.5:5000/api`*
+*Example: NEXT_PUBLIC_API_BASE_URL=http://192.168.1.10:5000/api*
 
-## 3. Restart Frontend
-You **MUST** stop and restart the frontend server (`npm run dev`) for the `.env` change to take effect.
+## 3. Restart Servers
+1. Stop the frontend terminal (Ctrl+C).
+2. Run `npm run dev` again.
+3. Ensure backend is running.
 
-## 4. Verification
-1. Open `http://<YOUR_LAN_IP>:3000` on your phone.
-2. Try to Login. It should work now.
-3. Check `http://<YOUR_LAN_IP>:5000/api/health` in your phone browser to ensure backend is searchable.
+## 4. Test on Phone
+1. Connect phone to **same Wi-Fi** as PC.
+2. Open Chrome/Safari on phone.
+3. Go to `http://<YOUR_LAN_IP>:5000/api/health` first.
+   - If you see `{"status":"ok"...}`, backend is reachable!
+4. Go to `http://<YOUR_LAN_IP>:3000`.
+   - Login and Products should now work perfectly.
 
----
-
-## For Vercel Deployment
-To make it work on Vercel production:
-1. Go to Vercel Project Settings > Environment Variables.
-2. Add `NEXT_PUBLIC_API_BASE_URL`.
-3. Set usage to your **Deployed Backend URL** (e.g., `https://my-backend.onrender.com/api`).
-   *(You cannot point Vercel to localhost! You must deploy the backend too.)*
+## Troubleshooting
+- **Firewall**: If `api/health` times out, your Windows Firewall might be blocking Node.js. Allow Node.js through firewall or temporarily turn off firewall to test.

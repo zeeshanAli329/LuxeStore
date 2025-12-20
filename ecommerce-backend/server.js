@@ -61,7 +61,8 @@ const { verifyTransport } = require("./utils/mailer");
 
 // Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, async () => {
+app.listen(PORT, "0.0.0.0", async () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Accesible on LAN at http://<YOUR_IP>:${PORT}`);
   await verifyTransport();
 });
