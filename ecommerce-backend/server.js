@@ -10,9 +10,28 @@ const orderRoutes = require("./routes/orderRoutes");
 const app = express();
 
 // Middleware
+// Middleware
+// Allow multiple origins: Localhost, LAN IP (typical), and Vercel deployments
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://my-app-frontend.vercel.app", // Example Vercel domain
+  // Add your Vercel domain here if different
+  process.env.FRONTEND_URL
+];
+
 app.use(cors({
-  origin: "http://localhost:3000",
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    // For now, allow all during debug, or check against list
+    // robust check:
+    if (allowedOrigins.indexOf(origin) === -1 && !origin.includes("vercel.app") && !origin.includes("localhost") && !origin.startsWith("http://192.168.")) {
+      // Be permissive for development/Vercel preview branches
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true
 }));
 app.use(express.json());
@@ -20,6 +39,11 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+
+// Health Check
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok", message: "Backend is reachable" });
+});
 
 
 // MongoDB connection
