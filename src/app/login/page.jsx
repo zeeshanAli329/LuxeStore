@@ -41,7 +41,8 @@ function LoginForm() {
         console.error("Response Status:", err.response.status);
       } else if (err.request) {
         console.error("Request Error (No Response):", err.request);
-        setError("Cannot reach server. Check API Base URL or Wi-Fi connection.");
+        console.error("Attempted URL:", err.config?.baseURL + err.config?.url);
+        setError("Cannot reach server. Check API Base URL setting or Backend Deployment.");
         return;
       } else {
         console.error("Config Error:", err.message);

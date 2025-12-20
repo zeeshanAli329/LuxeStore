@@ -14,8 +14,8 @@ const app = express();
 // Allow multiple origins: Localhost, LAN IP (typical), and Vercel deployments
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://my-app-frontend.vercel.app", // Example Vercel domain
-  // Add your Vercel domain here if different
+  "https://luxe-store-gray.vercel.app", // Explicitly allow Vercel App
+  "https://my-app-frontend.vercel.app",
   process.env.FRONTEND_URL
 ];
 
