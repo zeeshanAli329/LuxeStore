@@ -16,7 +16,15 @@ export default function Signup() {
             await apiRegister({ name, email, password });
             router.push("/login?registered=true");
         } catch (err) {
-            console.error(err);
+            console.error("Signup Error:", err);
+            if (err.response) {
+                console.error("Response Data:", err.response.data);
+                console.error("Response Status:", err.response.status);
+            } else if (err.request) {
+                console.error("Request Error (No Response):", err.request);
+            } else {
+                console.error("Config Error:", err.message);
+            }
             const msg = err.response?.data?.message || err.message || "Registration failed";
             setError(msg);
         }

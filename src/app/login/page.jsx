@@ -35,8 +35,16 @@ function LoginForm() {
         router.replace("/");
       }
     } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || "Login failed");
+      console.error("Login Error:", err);
+      if (err.response) {
+        console.error("Response Data:", err.response.data);
+        console.error("Response Status:", err.response.status);
+      } else if (err.request) {
+        console.error("Request Error (No Response):", err.request);
+      } else {
+        console.error("Config Error:", err.message);
+      }
+      setError(err.response?.data?.message || err.message || "Login failed");
     }
   };
 
