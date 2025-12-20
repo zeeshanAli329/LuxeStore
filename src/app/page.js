@@ -72,7 +72,7 @@ export default function Home() {
       {featuredProducts.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50">
           <h2 className="text-3xl font-extrabold text-gray-900 mb-8 text-center uppercase tracking-wide">Featured Products</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
             {featuredProducts.map((product) => (
               <ProductCard key={product._id} product={product} showCategory={false} />
             ))}
@@ -92,7 +92,7 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
           {products.slice(0, 20).map((product) => ( // Show first 20 or so, then link to shop
             <ProductCard key={product._id} product={product} showCategory={false} />
           ))}

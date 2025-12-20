@@ -68,7 +68,7 @@ function ShopContent() {
                     {filteredProducts.length === 0 ? (
                         <div className="text-center py-20 text-gray-500">No products found in this category.</div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                             {filteredProducts.map(product => (
                                 <Link key={product._id} href={`/product/${product._id}`} className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow">
                                     <div className="aspect-w-1 aspect-h-1 bg-gray-200 h-64 relative">

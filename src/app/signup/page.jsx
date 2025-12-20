@@ -14,9 +14,11 @@ export default function Signup() {
         e.preventDefault();
         try {
             await apiRegister({ name, email, password });
-            router.push("/login");
+            router.push("/login?registered=true");
         } catch (err) {
-            setError(err.response?.data?.message || "Registration failed");
+            console.error(err);
+            const msg = err.response?.data?.message || err.message || "Registration failed";
+            setError(msg);
         }
     };
 
