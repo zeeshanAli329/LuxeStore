@@ -21,15 +21,21 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    // For now, allow all during debug, or check against list
-    // robust check:
-    if (allowedOrigins.indexOf(origin) === -1 && !origin.includes("vercel.app") && !origin.includes("localhost") && !origin.startsWith("http://192.168.")) {
-      // Be permissive for development/Vercel preview branches
+
+    // Explicit whitelisting
+    if (allowedOrigins.indexOf(origin) !== -1) {
       return callback(null, true);
     }
-    return callback(null, true);
+
+    // Pattern matching for PR previews or unexpected subdomains
+    if (origin.includes("vercel.app") || origin.includes("localhost") || origin.startsWith("http://192.168.")) {
+      return callback(null, true);
+    }
+
+    // Default to block, but log it
+    console.warn("Blocked CORS origin:", origin);
+    return callback(new Error("Not allowed by CORS"));
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true
@@ -63,6 +69,6 @@ const { verifyTransport } = require("./utils/mailer");
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", async () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Accesible on LAN at http://<YOUR_IP>:${PORT}`);
+  console.log(`Accessible on LAN/WAN at http://0.0.0.0:${PORT}`);
   await verifyTransport();
 });
