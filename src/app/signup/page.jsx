@@ -22,6 +22,9 @@ export default function Signup() {
                 console.error("Response Status:", err.response.status);
             } else if (err.request) {
                 console.error("Request Error (No Response):", err.request);
+                console.error("Attempted URL:", err.config?.baseURL + err.config?.url);
+                setError("Cannot reach server. Check API Base URL setting or Backend Deployment.");
+                return;
             } else {
                 console.error("Config Error:", err.message);
             }
