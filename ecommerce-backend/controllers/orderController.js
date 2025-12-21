@@ -45,7 +45,10 @@ exports.createOrder = async (req, res) => {
                 unitPrice: item.unitPrice
             })),
             totalAmount,
-            shippingAddress,
+            shippingAddress: {
+                ...shippingAddress,
+                fullName: shippingAddress.fullName || req.user?.name || guestInfo?.name || "Customer"
+            },
             paymentMethod: "COD",
             paymentStatus: "Pending",
         });
@@ -130,5 +133,34 @@ exports.testEmail = async (req, res) => {
     } catch (err) {
         console.error("Test email failed:", err);
         res.status(500).json({ error: err.message });
+    }
+};
+
+// UPDATE ORDER STATUS (Admin)
+exports.updateOrderStatus = async (req, res) => {
+    try {
+        const { status } = req.body;
+        console.log(`[Admin] Updating order ${req.params.id} status to: ${status}`);
+
+        const order = await Order.findById(req.params.id);
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        order.status = status;
+        // If delivered, mark as paid automatically (since it's COD)
+        if (status === "Delivered") {
+            order.paymentStatus = "Paid";
+        }
+
+        await order.save();
+        res.json(order);
+    } catch (error) {
+        console.error("Status Update Error Stack:", error.stack);
+        res.status(500).json({
+            error: "Failed to update status",
+            message: error.message
+        });
     }
 };

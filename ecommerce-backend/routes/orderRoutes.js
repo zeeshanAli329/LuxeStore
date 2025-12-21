@@ -13,8 +13,7 @@ const router = express.Router();
 
 router.post("/", optionalAuth, createOrder);
 router.get("/myorders", protect, getMyOrders);
-router.post("/guest", createGuestOrder); // Public route
-router.get("/test-email", protect, admin, testEmail); // Admin only test
 router.get("/", protect, admin, getAllOrders);
+router.put("/:id/status", protect, admin, updateOrderStatus);
 
 module.exports = router;
