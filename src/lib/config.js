@@ -4,9 +4,9 @@
  */
 
 const getApiBaseUrl = () => {
-    // For production, use the environment variable
+    // FORCE "/api" in production for same-origin proxying.
     if (process.env.NODE_ENV === "production" || process.env.NEXT_PUBLIC_VERCEL_ENV === "production") {
-        return process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
+        return "/api";
     }
 
     // Local Development Fallback
