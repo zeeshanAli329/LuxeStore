@@ -43,31 +43,49 @@ exports.createOrder = async (req, res) => {
             paymentStatus: "Pending",
         });
 
-        // Send Email Async
-        const { sendOrderEmail } = require("../utils/mailer");
-        const customerEmail = req.user ? req.user.email : (req.body.guestInfo?.email || null);
-
-        // Final safety check before db operations that follow
-        if (!req.user && !req.body.guestInfo) {
-            console.warn("[Order] No user or guestInfo provided for order confirmation email.");
+        // Send Email (Non-blocking but awaited for safety in some serverless contexts)
+        try {
+            const { sendOrderEmail } = require("../utils/mailer");
+            const customerEmail = req.user ? req.user.email : (req.body.guestInfo?.email || null);
+            await sendOrderEmail(order, customerEmail);
+        } catch (mailError) {
+            console.error("[Order] Email notification failed:", mailError.message);
         }
 
-        sendOrderEmail(order, customerEmail);
-
-        // Clear Cart (only for logged in users)
+        // Clear Cart (only for logged in users) - Non-blocking
         if (req.user) {
-            await User.findByIdAndUpdate(req.user._id, { cart: [] });
+            try {
+                await User.findByIdAndUpdate(req.user._id, { cart: [] });
+            } catch (cartError) {
+                console.error("[Order] Cart cleanup failed:", cartError.message);
+            }
         }
 
-        res.status(201).json(order);
+        return res.status(201).json(order);
     } catch (error) {
         console.error("Order Creation Error Stack:", error.stack);
+
+        // Handle Mongoose Validation Errors
         if (error.name === "ValidationError") {
-            return res.status(400).json({ error: "Validation Failed", details: error.message });
+            return res.status(400).json({
+                error: "Validation Failed",
+                message: error.message,
+                details: Object.values(error.errors).map(err => err.message)
+            });
         }
-        res.status(500).json({
+
+        // Handle Mongoose Cast Errors (Invalid IDs)
+        if (error.name === "CastError") {
+            return res.status(400).json({
+                error: "Invalid ID Format",
+                message: `Invalid format for field: ${error.path}`,
+                details: error.reason?.message || error.message
+            });
+        }
+
+        return res.status(500).json({
             error: "Order creation failed",
-            details: "An internal server error occurred. Please contact support."
+            message: error.message
         });
     }
 };
@@ -132,18 +150,37 @@ exports.createGuestOrder = async (req, res) => {
             paymentStatus: "Pending",
         });
 
-        // Send Email Async
-        const { sendOrderEmail } = require("../utils/mailer");
-        if (guestInfo.email) {
-            sendOrderEmail(order, guestInfo.email);
-        } else {
-            // Just admin
-            sendOrderEmail(order, null);
+        // Send Email - Non-blocking
+        try {
+            const { sendOrderEmail } = require("../utils/mailer");
+            const customerEmail = guestInfo.email || null;
+            await sendOrderEmail(order, customerEmail);
+        } catch (mailError) {
+            console.error("[Order] Guest Email notification failed:", mailError.message);
         }
 
-        res.status(201).json(order);
+        return res.status(201).json(order);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Guest Order Creation Error Stack:", error.stack);
+
+        if (error.name === "ValidationError") {
+            return res.status(400).json({
+                error: "Validation Failed",
+                message: error.message
+            });
+        }
+
+        if (error.name === "CastError") {
+            return res.status(400).json({
+                error: "Invalid ID Format",
+                message: `Invalid format for field: ${error.path}`
+            });
+        }
+
+        return res.status(500).json({
+            error: "Guest order failed",
+            message: error.message
+        });
     }
 };
 
