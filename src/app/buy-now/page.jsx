@@ -69,7 +69,6 @@ function BuyNowContent() {
                 }],
                 totalAmount,
                 shippingAddress: {
-                    fullName: name,
                     address,
                     city,
                     postalCode: zip,

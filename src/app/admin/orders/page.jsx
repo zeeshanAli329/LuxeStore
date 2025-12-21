@@ -25,12 +25,10 @@ export default function AdminOrdersPage() {
     const handleStatusUpdate = async (id, newStatus) => {
         try {
             await api.put(`/orders/${id}/status`, { status: newStatus });
-            // Refresh local state
+            // Refresh
             setOrders(prev => prev.map(o => o._id === id ? { ...o, status: newStatus } : o));
         } catch (err) {
-            console.error(err);
-            const msg = err.response?.data?.message || err.response?.data?.error || "Failed to update status";
-            alert(`Error: ${msg}`);
+            alert("Failed to update status");
         }
     };
 
@@ -38,39 +36,31 @@ export default function AdminOrdersPage() {
 
     return (
         <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-6">Orders Management</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-6">Orders</h1>
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 text-xs uppercase font-semibold">
                             <tr>
-                                <th className="px-6 py-4">Order info</th>
-                                <th className="px-6 py-4">Customer Details</th>
-                                <th className="px-6 py-4">Shipping Info</th>
+                                <th className="px-6 py-4">Order ID</th>
+                                <th className="px-6 py-4">User</th>
                                 <th className="px-6 py-4">Total</th>
                                 <th className="px-6 py-4">Status</th>
                                 <th className="px-6 py-4">Date</th>
+                                {/* <th className="px-6 py-4">Actions</th> */}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {orders.map(order => (
                                 <tr key={order._id} className="hover:bg-gray-50/50 transition-colors">
                                     <td className="px-6 py-4 text-sm font-mono text-gray-600">
-                                        <div className="font-bold text-gray-900">#{order._id.slice(-6)}</div>
-                                        <div className="text-xs text-gray-400 mt-1">{order.paymentMethod} • {order.paymentStatus}</div>
+                                        #{order._id.slice(-6)}
+                                        <div className="text-xs text-gray-400 mt-1">{order.paymentMethod}</div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="text-sm font-medium text-gray-900">{order.shippingAddress?.fullName || order.user?.name || "Guest"}</div>
-                                        <div className="text-xs text-gray-500">{order.user?.email || "No email"}</div>
-                                        <div className="text-xs text-blue-600 font-medium">{order.shippingAddress?.phone}</div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="text-xs text-gray-700 max-w-[200px] truncate" title={order.shippingAddress?.address}>
-                                            {order.shippingAddress?.address}
-                                        </div>
-                                        <div className="text-xs text-gray-500">
-                                            {order.shippingAddress?.city}, {order.shippingAddress?.postalCode}
-                                        </div>
+                                        <div className="text-sm font-medium text-gray-900">{order.user?.name || "Guest"}</div>
+                                        <div className="text-xs text-gray-500">{order.user?.email}</div>
+                                        <div className="text-xs text-blue-500">{order.shippingAddress?.phone}</div>
                                     </td>
                                     <td className="px-6 py-4 text-sm font-bold text-gray-900">{formatPKR(order.totalAmount)}</td>
                                     <td className="px-6 py-4">

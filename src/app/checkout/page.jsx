@@ -70,7 +70,6 @@ export default function Checkout() {
                 products,
                 totalAmount,
                 shippingAddress: {
-                    fullName: user.name,
                     address,
                     city,
                     postalCode: zip,
