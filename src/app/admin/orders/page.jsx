@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import api from "@/utils/api";
+import api from "@/lib/api";
 import { formatPKR } from "@/utils/currency"; // Import currency utility
 
 export default function AdminOrdersPage() {

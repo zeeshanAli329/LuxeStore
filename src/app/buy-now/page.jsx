@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import api from "@/utils/api";
+import api from "@/lib/api";
 import { formatPKR } from "@/utils/currency";
 
 function BuyNowContent() {

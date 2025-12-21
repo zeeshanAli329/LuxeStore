@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import api from "../../../utils/api";
+import api from "@/lib/api";
 import { useStore } from "../../../store";
 
 export default function AdminSettingsPage() {

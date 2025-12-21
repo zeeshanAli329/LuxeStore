@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, Suspense } from "react";
-import api from "../../utils/api";
+import api from "@/lib/api";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { formatPKR } from "@/utils/currency";

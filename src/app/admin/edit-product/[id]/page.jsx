@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import api from "../../../../utils/api";
+import api from "@/lib/api";
 
 export default function EditProductPage({ params }) {
     const { id } = params;

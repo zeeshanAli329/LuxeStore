@@ -1,4 +1,4 @@
-import api from "../utils/api";
+import api from "../lib/api";
 
 // Get all products
 export const getProducts = async (params) => {

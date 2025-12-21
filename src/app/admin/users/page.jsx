@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import api from "../../../utils/api";
+import api from "@/lib/api";
 
 export default function UsersPage() {
     const [users, setUsers] = useState([]);

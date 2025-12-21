@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import api from "@/utils/api";
+import api from "@/lib/api";
 import { formatPKR } from "@/utils/currency"; // Use PKR
 import Hero from "@/components/Hero";
 import Testimonials from "@/components/Testimonials";

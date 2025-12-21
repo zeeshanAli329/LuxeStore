@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import { formatPKR } from "@/utils/currency";
-import api from "@/utils/api";
+import api from "@/lib/api";
 
 function ThankYouContent() {
     const searchParams = useSearchParams();

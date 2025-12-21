@@ -1,4 +1,4 @@
-import api from "../utils/api";
+import api from "../lib/api";
 
 // Create Order
 export const createOrder = async (orderData) => {

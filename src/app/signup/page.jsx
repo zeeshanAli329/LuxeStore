@@ -12,24 +12,27 @@ export default function Signup() {
 
     const handleSignup = async (e) => {
         e.preventDefault();
+        setError("");
         try {
+            console.log(`[Signup] Attempting registration for: ${email}`);
             await apiRegister({ name, email, password });
             router.push("/login?registered=true");
         } catch (err) {
             console.error("Signup Error:", err);
-            if (err.response) {
-                console.error("Response Data:", err.response.data);
-                console.error("Response Status:", err.response.status);
-            } else if (err.request) {
-                console.error("Request Error (No Response):", err.request);
-                console.error("Attempted URL:", err.config?.baseURL + err.config?.url);
-                setError("Cannot reach server. Check API Base URL setting or Backend Deployment.");
-                return;
+
+            if (!err.response) {
+                // Network error
+                console.error("Backend unreachable (API base URL error or down).", {
+                    baseURL: err.config?.baseURL,
+                    url: err.config?.url,
+                    method: err.config?.method
+                });
+                setError("Backend unreachable. Check API Base URL setting or Backend Deployment.");
             } else {
-                console.error("Config Error:", err.message);
+                // Server error
+                console.error("Response Data:", err.response.data);
+                setError(err.response.data?.message || "Registration failed. Please try again.");
             }
-            const msg = err.response?.data?.message || err.message || "Registration failed";
-            setError(msg);
         }
     };
 

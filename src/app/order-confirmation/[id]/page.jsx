@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import api from "@/utils/api";
+import api from "@/lib/api";
 import { formatPKR } from "@/utils/currency";
 
 export default function OrderConfirmation() {
