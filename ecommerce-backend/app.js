@@ -12,18 +12,18 @@ const app = express();
 // CORS Configuration
 const allowedOrigins = [
   "http://localhost:3000",
+  "http://127.0.0.1:3000",
   "https://luxe-store-gray.vercel.app",
-  "https://luxe-store-zeta.vercel.app", // Common Vercel pattern
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 ||
-      origin.includes("vercel.app") ||
-      origin.includes("localhost") ||
-      origin.startsWith("http://192.168.")) {
+    const isVercel = origin && (origin.endsWith(".vercel.app") || origin.includes("vercel.app"));
+    const isLocal = origin && (origin.includes("localhost") || origin.includes("127.0.0.1"));
+    const isAllowed = allowedOrigins.indexOf(origin) !== -1 || isVercel || isLocal;
+
+    if (!origin || isAllowed) {
       return callback(null, true);
     }
     console.warn("Blocked CORS origin:", origin);
@@ -39,16 +39,23 @@ app.use(cors(corsOptions));
 
 // Safe Preflight Middleware (replaces app.options("*") which causes PathError)
 app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  const isVercel = origin && (origin.endsWith(".vercel.app") || origin.includes("vercel.app"));
+  const isLocal = origin && (origin.includes("localhost") || origin.includes("127.0.0.1"));
+  const isAllowed = allowedOrigins.indexOf(origin) !== -1 || isVercel || isLocal;
+
+  if (isAllowed) {
+    res.header("Access-Control-Allow-Origin", origin);
+  } else {
+    // Fallback but still allow public GETs if needed
+    res.header("Access-Control-Allow-Origin", "*");
+  }
+
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+
   if (req.method === "OPTIONS") {
-    const origin = req.headers.origin;
-    if (origin && (allowedOrigins.indexOf(origin) !== -1 || origin.includes("vercel.app") || origin.includes("localhost"))) {
-      res.header("Access-Control-Allow-Origin", origin);
-    } else {
-      res.header("Access-Control-Allow-Origin", "*");
-    }
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.header("Access-Control-Allow-Credentials", "true");
     return res.status(204).end();
   }
   next();

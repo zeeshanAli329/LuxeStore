@@ -6,19 +6,8 @@ import { API_BASE } from "./config";
  * Used for all network calls in the application.
  * Favor same-origin proxy (/api) in production/non-localhost environments.
  */
-const getBaseURL = () => {
-    if (typeof window !== "undefined") {
-        const hostname = window.location.hostname;
-        // If not localhost, we MUST use the proxy to reach the backend
-        if (hostname !== "localhost" && hostname !== "127.0.0.1") {
-            return "/api";
-        }
-    }
-    return API_BASE; // Fallback to config.js logic
-};
-
 const api = axios.create({
-    baseURL: getBaseURL(),
+    baseURL: API_BASE,
     headers: {
         "Content-Type": "application/json",
     },

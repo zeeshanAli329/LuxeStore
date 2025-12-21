@@ -4,18 +4,18 @@
  */
 
 const getApiBaseUrl = () => {
-    // FORCE "/api" in production for same-origin proxying.
-    // This is the most reliable way to handle mobile connectivity.
+    // For production, use the environment variable
     if (process.env.NODE_ENV === "production" || process.env.NEXT_PUBLIC_VERCEL_ENV === "production") {
-        return "/api";
+        return process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
     }
 
     // Local Development Fallback
-    return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
+    return "http://localhost:5000/api";
 };
 
 export const API_BASE = getApiBaseUrl();
 
+// Log the computed base URL once
 if (typeof window !== "undefined") {
-    console.log(`[API Config] Mode: ${process.env.NODE_ENV} | Base: ${API_BASE}`);
+    console.log(`[API Client] Setting baseURL to: ${API_BASE}`);
 }
