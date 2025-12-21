@@ -72,19 +72,15 @@ function LoginForm() {
       console.error("Login Error:", err);
 
       if (!err.response) {
-        // Network error or backend unreachable
-        const attemptUrl = `${err.config?.baseURL || ""}${err.config?.url || ""}`;
-        console.error("Backend unreachable (API base URL error or down).", {
+        // Network error - Most common on mobile if URL is wrong or proxy fails
+        setError("Connectivity Error. Please check your internet or try again later.");
+        console.error("Network Error Details:", {
           baseURL: err.config?.baseURL,
-          url: err.config?.url,
-          method: err.config?.method,
-          attemptedFullURL: attemptUrl
+          url: err.config?.url
         });
-        setError("Backend unreachable. Check API Base URL setting or Backend Deployment.");
       } else {
-        // Server responded with error
-        console.error("Response Data:", err.response.data);
-        setError(err.response.data?.message || "Login failed. Please check credentials.");
+        // Server responded with error (e.g. 401 Unauthorized)
+        setError(err.response.data?.message || "Invalid email or password.");
       }
     }
   };

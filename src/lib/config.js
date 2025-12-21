@@ -4,15 +4,13 @@
  */
 
 const getApiBaseUrl = () => {
-    const isProd = process.env.NODE_ENV === "production";
-
-    if (isProd) {
-        // In production, we proxy through the Vercel domain (/api)
-        // This avoids CORS and mobile connectivity issues.
+    // FORCE "/api" in production for same-origin proxying.
+    // This is the most reliable way to handle mobile connectivity.
+    if (process.env.NODE_ENV === "production" || process.env.NEXT_PUBLIC_VERCEL_ENV === "production") {
         return "/api";
     }
 
-    // Fallback for local development
+    // Local Development Fallback
     return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
 };
 

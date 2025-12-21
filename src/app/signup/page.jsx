@@ -21,16 +21,10 @@ export default function Signup() {
             console.error("Signup Error:", err);
 
             if (!err.response) {
-                // Network error
-                console.error("Backend unreachable (API base URL error or down).", {
-                    baseURL: err.config?.baseURL,
-                    url: err.config?.url,
-                    method: err.config?.method
-                });
-                setError("Backend unreachable. Check API Base URL setting or Backend Deployment.");
+                // Network error - Most common on mobile if proxy fails
+                setError("Connectivity Error. Please check your internet or try again later.");
             } else {
                 // Server error
-                console.error("Response Data:", err.response.data);
                 setError(err.response.data?.message || "Registration failed. Please try again.");
             }
         }
