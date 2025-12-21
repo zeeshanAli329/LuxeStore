@@ -2,7 +2,7 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "https://luxe-backend.vercel.app/api/:path*"
+            "destination": "https://luxe-store-backend-peach.vercel.app/api/:path*"
         }
     ]
 }

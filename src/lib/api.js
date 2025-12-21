@@ -44,7 +44,7 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (!error.response) {
-            console.error("Backend not reachable from this device. Using /api proxy.", {
+            console.error("Backend unreachable (proxy/API).", {
                 baseURL: error.config?.baseURL,
                 url: error.config?.url,
                 method: error.config?.method

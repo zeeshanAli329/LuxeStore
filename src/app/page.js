@@ -117,7 +117,7 @@ function ProductCard({ product, showCategory = false }) {
 
   return (
     <Link href={`/product/${product._id}`} className="group block w-full h-full cursor-pointer bg-white rounded-xl border border-gray-100 hover:shadow-xl transition-shadow flex flex-col">
-      <div className="w-full h-40 sm:h-auto sm:aspect-w-1 sm:aspect-h-1 bg-gray-200 relative overflow-hidden">
+      <div className="w-full h-48 bg-gray-200 relative">
         <img
           src={product.image}
           alt={product.title}

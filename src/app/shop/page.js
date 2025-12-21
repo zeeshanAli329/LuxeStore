@@ -71,7 +71,7 @@ function ShopContent() {
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                             {filteredProducts.map(product => (
                                 <Link key={product._id} href={`/product/${product._id}`} className="group block w-full bg-white rounded-xl border border-gray-100 hover:shadow-lg transition-shadow">
-                                    <div className="w-full h-40 sm:h-auto aspect-w-1 aspect-h-1 bg-gray-200 relative">
+                                    <div className="w-full h-48 bg-gray-200 relative">
                                         <img
                                             src={product.image || "https://placehold.co/400"}
                                             alt={product.title}
