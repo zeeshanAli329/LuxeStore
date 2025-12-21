@@ -72,7 +72,7 @@ export default function Home() {
       {featuredProducts.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50">
           <h2 className="text-3xl font-extrabold text-gray-900 mb-8 text-center uppercase tracking-wide">Featured Products</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-8">
             {featuredProducts.map((product) => (
               <ProductCard key={product._id} product={product} showCategory={false} />
             ))}
@@ -116,7 +116,7 @@ function ProductCard({ product, showCategory = false }) {
   if (!product) return null;
 
   return (
-    <Link href={`/product/${product._id}`} className="group block w-full h-full cursor-pointer bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow flex flex-col">
+    <Link href={`/product/${product._id}`} className="group block w-full h-full cursor-pointer bg-white rounded-xl border border-gray-100 hover:shadow-xl transition-shadow flex flex-col">
       <div className="w-full h-40 sm:h-auto sm:aspect-w-1 sm:aspect-h-1 bg-gray-200 relative overflow-hidden">
         <img
           src={product.image}

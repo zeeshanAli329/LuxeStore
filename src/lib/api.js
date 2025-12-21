@@ -4,10 +4,21 @@ import { API_BASE } from "./config";
 /**
  * Standard API Client
  * Used for all network calls in the application.
- * In production, this uses same-origin proxy (/api)
+ * Favor same-origin proxy (/api) in production/non-localhost environments.
  */
+const getBaseURL = () => {
+    if (typeof window !== "undefined") {
+        const hostname = window.location.hostname;
+        // If not localhost, we MUST use the proxy to reach the backend
+        if (hostname !== "localhost" && hostname !== "127.0.0.1") {
+            return "/api";
+        }
+    }
+    return API_BASE; // Fallback to config.js logic
+};
+
 const api = axios.create({
-    baseURL: API_BASE,
+    baseURL: getBaseURL(),
     headers: {
         "Content-Type": "application/json",
     },
@@ -33,7 +44,7 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (!error.response) {
-            console.error("Connectivity Error (Check Proxy Configuration):", {
+            console.error("Backend not reachable from this device. Using /api proxy.", {
                 baseURL: error.config?.baseURL,
                 url: error.config?.url,
                 method: error.config?.method
