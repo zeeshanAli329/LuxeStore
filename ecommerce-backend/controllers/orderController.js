@@ -45,14 +45,30 @@ exports.createOrder = async (req, res) => {
 
         // Send Email Async
         const { sendOrderEmail } = require("../utils/mailer");
-        sendOrderEmail(order, req.user.email);
+        const customerEmail = req.user ? req.user.email : (req.body.guestInfo?.email || null);
 
-        // Clear Cart
-        await User.findByIdAndUpdate(req.user._id, { cart: [] });
+        // Final safety check before db operations that follow
+        if (!req.user && !req.body.guestInfo) {
+            console.warn("[Order] No user or guestInfo provided for order confirmation email.");
+        }
+
+        sendOrderEmail(order, customerEmail);
+
+        // Clear Cart (only for logged in users)
+        if (req.user) {
+            await User.findByIdAndUpdate(req.user._id, { cart: [] });
+        }
 
         res.status(201).json(order);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Order Creation Error Stack:", error.stack);
+        if (error.name === "ValidationError") {
+            return res.status(400).json({ error: "Validation Failed", details: error.message });
+        }
+        res.status(500).json({
+            error: "Order creation failed",
+            details: "An internal server error occurred. Please contact support."
+        });
     }
 };
 

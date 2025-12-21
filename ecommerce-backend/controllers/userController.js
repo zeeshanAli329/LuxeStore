@@ -6,8 +6,9 @@ const jwt = require("jsonwebtoken");
 exports.registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    const normalizedEmail = email.trim().toLowerCase();
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: normalizedEmail });
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -32,14 +33,17 @@ exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail }).select("+password");
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      console.log(`[Login] User not found for email: ${normalizedEmail}`);
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      console.log(`[Login] Password mismatch for user: ${normalizedEmail}`);
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const token = jwt.sign(
@@ -84,6 +88,9 @@ exports.updateUserProfile = async (req, res) => {
 
     if (user) {
       user.name = req.body.name || user.name;
+      if (req.body.email) {
+        user.email = req.body.email.trim().toLowerCase();
+      }
       if (req.body.password) {
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(req.body.password, salt);
