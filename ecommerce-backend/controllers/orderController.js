@@ -1,34 +1,41 @@
 const Order = require("../models/Order");
 const User = require("../models/User");
 
-// CREATE ORDER
+// CREATE ORDER (Unified for User & Guest)
 exports.createOrder = async (req, res) => {
     try {
-        const { products, totalAmount, shippingAddress } = req.body;
-        console.log("Create Order Request:", { productsLength: products?.length, totalAmount, shippingAddress, user: req.user?._id });
+        const { products, totalAmount, shippingAddress, guestInfo } = req.body;
 
+        // Diagnostic Logging for Production
+        console.log("--- CREATE ORDER DIAGNOSTICS ---");
+        console.log("UserID:", req.user?._id || "Guest");
+        console.log("Payload Keys:", Object.keys(req.body));
+        console.log("Products Count:", products?.length);
+        console.log("Shipping Phone:", shippingAddress?.phone);
+
+        // Validation
         if (!products || products.length === 0) {
             return res.status(400).json({ message: "No items in order" });
         }
 
-        // Validate Totals and Prices
         if (!totalAmount || isNaN(Number(totalAmount)) || Number(totalAmount) <= 0) {
             return res.status(400).json({ message: "Invalid total amount" });
         }
 
-        // Validate Products
         const validProducts = products.every(p => p.unitPrice && !isNaN(Number(p.unitPrice)));
         if (!validProducts) {
             return res.status(400).json({ message: "Invalid product prices detected" });
         }
 
-        // Validate Phone
-        if (!shippingAddress || !shippingAddress.phone) {
-            return res.status(400).json({ message: "Phone number is required for delivery" });
+        // Validate Shipping Address
+        if (!shippingAddress || !shippingAddress.address || !shippingAddress.phone) {
+            return res.status(400).json({ message: "Complete shipping address and phone are required" });
         }
 
+        // Create the Order
         const order = await Order.create({
-            user: req.user ? req.user._id : undefined, // Check if user exists
+            user: req.user ? req.user._id : undefined,
+            guestInfo: req.user ? undefined : guestInfo,
             products: products.map(item => ({
                 product: item.product,
                 quantity: item.quantity,
@@ -43,16 +50,18 @@ exports.createOrder = async (req, res) => {
             paymentStatus: "Pending",
         });
 
-        // Send Email (Non-blocking but awaited for safety in some serverless contexts)
+        console.log("[Order] Created Successfully:", order._id);
+
+        // Send Email (Non-blocking)
         try {
             const { sendOrderEmail } = require("../utils/mailer");
-            const customerEmail = req.user ? req.user.email : (req.body.guestInfo?.email || null);
+            const customerEmail = req.user ? req.user.email : (guestInfo?.email || null);
             await sendOrderEmail(order, customerEmail);
         } catch (mailError) {
             console.error("[Order] Email notification failed:", mailError.message);
         }
 
-        // Clear Cart (only for logged in users) - Non-blocking
+        // Clear Cart (only for logged-in users)
         if (req.user) {
             try {
                 await User.findByIdAndUpdate(req.user._id, { cart: [] });
@@ -63,28 +72,25 @@ exports.createOrder = async (req, res) => {
 
         return res.status(201).json(order);
     } catch (error) {
-        console.error("Order Creation Error Stack:", error.stack);
+        console.error("CRITICAL ORDER ERROR:", error.stack);
 
-        // Handle Mongoose Validation Errors
         if (error.name === "ValidationError") {
+            const messages = Object.values(error.errors).map(val => val.message);
             return res.status(400).json({
                 error: "Validation Failed",
-                message: error.message,
-                details: Object.values(error.errors).map(err => err.message)
+                message: messages.join(", ")
             });
         }
 
-        // Handle Mongoose Cast Errors (Invalid IDs)
         if (error.name === "CastError") {
             return res.status(400).json({
-                error: "Invalid ID Format",
-                message: `Invalid format for field: ${error.path}`,
-                details: error.reason?.message || error.message
+                error: "Database Link Error",
+                message: `Invalid ID provided for ${error.path}`
             });
         }
 
         return res.status(500).json({
-            error: "Order creation failed",
+            error: "Internal Server Error",
             message: error.message
         });
     }
@@ -110,78 +116,9 @@ exports.getAllOrders = async (req, res) => {
     }
 };
 
-// CREATE GUEST ORDER
+// DEPRECATED: Points to unified createOrder
 exports.createGuestOrder = async (req, res) => {
-    try {
-        const { products, totalAmount, shippingAddress, guestInfo } = req.body;
-
-        if (!products || products.length === 0) {
-            return res.status(400).json({ message: "No items in order" });
-        }
-
-        if (!guestInfo || !guestInfo.name || !guestInfo.phone) {
-            return res.status(400).json({ message: "Guest name and phone are required" });
-        }
-
-        // Validate Totals
-        if (!totalAmount || isNaN(Number(totalAmount)) || Number(totalAmount) <= 0) {
-            return res.status(400).json({ message: "Invalid total amount" });
-        }
-
-        const validProducts = products.every(p => p.unitPrice && !isNaN(Number(p.unitPrice)));
-        if (!validProducts) {
-            return res.status(400).json({ message: "Invalid product prices detected" });
-        }
-
-        const order = await Order.create({
-            // user: undefined // Explicitly undefined for guest
-            products: products.map(item => ({
-                product: item.product,
-                quantity: item.quantity,
-                selectedColor: item.selectedColor,
-                selectedSize: item.selectedSize,
-                image: item.image,
-                unitPrice: item.unitPrice
-            })),
-            totalAmount,
-            shippingAddress,
-            guestInfo,
-            paymentMethod: "COD",
-            paymentStatus: "Pending",
-        });
-
-        // Send Email - Non-blocking
-        try {
-            const { sendOrderEmail } = require("../utils/mailer");
-            const customerEmail = guestInfo.email || null;
-            await sendOrderEmail(order, customerEmail);
-        } catch (mailError) {
-            console.error("[Order] Guest Email notification failed:", mailError.message);
-        }
-
-        return res.status(201).json(order);
-    } catch (error) {
-        console.error("Guest Order Creation Error Stack:", error.stack);
-
-        if (error.name === "ValidationError") {
-            return res.status(400).json({
-                error: "Validation Failed",
-                message: error.message
-            });
-        }
-
-        if (error.name === "CastError") {
-            return res.status(400).json({
-                error: "Invalid ID Format",
-                message: `Invalid format for field: ${error.path}`
-            });
-        }
-
-        return res.status(500).json({
-            error: "Guest order failed",
-            message: error.message
-        });
-    }
+    return exports.createOrder(req, res);
 };
 
 // TEST EMAIL

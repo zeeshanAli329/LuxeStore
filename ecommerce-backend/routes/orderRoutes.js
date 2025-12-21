@@ -7,10 +7,11 @@ const {
     testEmail
 } = require("../controllers/orderController");
 const { protect, admin } = require("../middleware/authMiddleware");
+const optionalAuth = require("../middleware/optionalAuth");
 
 const router = express.Router();
 
-router.post("/", protect, createOrder);
+router.post("/", optionalAuth, createOrder);
 router.get("/myorders", protect, getMyOrders);
 router.post("/guest", createGuestOrder); // Public route
 router.get("/test-email", protect, admin, testEmail); // Admin only test

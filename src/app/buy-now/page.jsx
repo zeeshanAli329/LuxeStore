@@ -82,7 +82,7 @@ function BuyNowContent() {
                 }
             };
 
-            const res = await api.post("/orders/guest", payload);
+            const res = await api.post("/orders", payload);
             router.push(`/thank-you?orderId=${res.data._id}`);
 
         } catch (err) {
