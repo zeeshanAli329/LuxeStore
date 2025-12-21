@@ -77,26 +77,6 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// MongoDB connection optimized for Serverless
-const connectDB = async () => {
-  if (mongoose.connection.readyState >= 1) return;
-  try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("MongoDB Connected Successfully");
-  } catch (err) {
-    console.error("MongoDB Connection Error:", err);
-  }
-};
-
-// Explicit connect for persistent environments
-connectDB();
-
-// Middleware for serverless cold-start DB connections
-app.use(async (req, res, next) => {
-  await connectDB();
-  next();
-});
-
 app.get("/", (req, res) => {
   res.send("API running...");
 });
