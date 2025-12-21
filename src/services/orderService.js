@@ -1,8 +1,11 @@
 import api from "../lib/api";
+import { getAuthHeader } from "../lib/authHeader";
 
 // Create Order
 export const createOrder = async (orderData) => {
-    const response = await api.post("/orders", orderData);
+    const response = await api.post("/orders", orderData, {
+        headers: getAuthHeader()
+    });
     return response.data;
 };
 

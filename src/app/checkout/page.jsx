@@ -61,6 +61,11 @@ export default function Checkout() {
                 unitPrice: Number(item.product.newPrice || item.product.price || 0)
             }));
 
+            if (typeof window !== "undefined" && !localStorage.getItem("token")) {
+                setError("Session expired. Please log in again.");
+                return;
+            }
+
             const res = await createOrder({
                 products,
                 totalAmount,
