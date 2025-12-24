@@ -46,7 +46,7 @@ exports.getProductById = async (req, res) => {
 // CREATE PRODUCT (ADMIN)
 exports.createProduct = async (req, res) => {
     try {
-        const { title, description, image, images, oldPrice, newPrice, discount, category, stock, isFeatured, colors, sizes } = req.body;
+        const { title, description, image, images, video, oldPrice, newPrice, discount, category, stock, isFeatured, colors, sizes } = req.body;
 
         // Calculate discount if not provided but old/new prices are
         let finalDiscount = discount;
@@ -58,7 +58,8 @@ exports.createProduct = async (req, res) => {
             title,
             description,
             image,
-            images: images || [],
+            images: Array.isArray(images) ? images.filter(img => img.trim() !== "") : [],
+            video: video ? video.trim() : "",
             oldPrice,
             newPrice,
             discount: finalDiscount || 0,
@@ -95,6 +96,11 @@ exports.updateProduct = async (req, res) => {
         product.isFeatured = req.body.isFeatured !== undefined ? req.body.isFeatured : product.isFeatured;
         product.colors = req.body.colors || product.colors;
         product.sizes = req.body.sizes || product.sizes;
+        product.video = req.body.video !== undefined ? req.body.video.trim() : product.video;
+
+        if (req.body.images !== undefined) {
+            product.images = Array.isArray(req.body.images) ? req.body.images.filter(img => img.trim() !== "") : [];
+        }
 
         // Recalculate discount if prices changed
         if (req.body.oldPrice || req.body.newPrice) {

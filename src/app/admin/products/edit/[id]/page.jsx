@@ -27,7 +27,9 @@ export default function EditProductPage({ params }) {
         stock: 0,
         isFeatured: false,
         colors: "", // comma separated
-        sizes: ""   // comma separated
+        sizes: "",   // comma separated
+        images: "", // comma separated
+        video: ""
     });
 
     useEffect(() => {
@@ -46,7 +48,9 @@ export default function EditProductPage({ params }) {
                     stock: p.stock,
                     isFeatured: p.isFeatured,
                     colors: (p.colors || []).join(", "),
-                    sizes: (p.sizes || []).join(", ")
+                    sizes: (p.sizes || []).join(", "),
+                    images: (p.images || []).join(", "),
+                    video: p.video || ""
                 });
             } catch (error) {
                 console.error("Failed to fetch product", error);
@@ -82,6 +86,8 @@ export default function EditProductPage({ params }) {
                 discount: formData.discount ? Number(formData.discount) : undefined,
                 colors: formData.colors.split(",").map(c => c.trim()).filter(Boolean),
                 sizes: formData.sizes.split(",").map(s => s.trim()).filter(Boolean),
+                images: formData.images.split(",").map(i => i.trim()).filter(Boolean),
+                video: formData.video.trim(),
                 price: Number(formData.newPrice)
             };
             await api.put(`/products/${id}`, payload);
@@ -138,7 +144,6 @@ export default function EditProductPage({ params }) {
                     </div>
 
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                         <textarea
                             name="description"
                             required
@@ -147,6 +152,32 @@ export default function EditProductPage({ params }) {
                             value={formData.description}
                             onChange={handleChange}
                         />
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Additional Image URLs</label>
+                        <textarea
+                            name="images"
+                            placeholder="https://image1.jpg, https://image2.jpg..."
+                            rows="2"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none resize-none"
+                            value={formData.images}
+                            onChange={handleChange}
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Comma separated list of hosted image URLs</p>
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Video URL (Optional)</label>
+                        <input
+                            type="url"
+                            name="video"
+                            placeholder="https://video.mp4"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none"
+                            value={formData.video}
+                            onChange={handleChange}
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Link to a video file (mp4 preferred)</p>
                     </div>
                 </div>
 

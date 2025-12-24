@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useStore } from "@/store";
 import { getProductById } from "../../services/productService";
 import { DetailsSkeleton } from "@/components/ui/Skeletons";
+import ProductGallery from "@/components/ProductGallery";
 
 export default function DetailsPage({ id }) {
     const [product, setProduct] = useState(null);
@@ -87,16 +88,17 @@ export default function DetailsPage({ id }) {
                 <div className="bg-white rounded-[20px] shadow-sm overflow-hidden mb-16">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 p-8 lg:p-12">
                         {/* Image Column */}
-                        <div className="flex items-center justify-center bg-white p-6 rounded-xl relative">
+                        <div className="relative">
                             {product.discount > 0 && (
-                                <span className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+                                <span className="absolute top-4 left-4 z-10 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg">
                                     -{product.discount}%
                                 </span>
                             )}
-                            <img
-                                src={product.image || "/placeholder.png"}
-                                alt={product.title}
-                                className="object-contain max-h-[400px] w-full rounded-xl "
+                            <ProductGallery
+                                mainImage={product.image}
+                                additionalImages={product.images}
+                                video={product.video}
+                                title={product.title}
                             />
                         </div>
 
@@ -155,7 +157,7 @@ export default function DetailsPage({ id }) {
                                                 <button
                                                     key={color}
                                                     onClick={() => setSelectedColor(color)}
-                                                    className={`px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all ${selectedColor === color
+                                                    className={`px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all cursor-pointer ${selectedColor === color
                                                         ? 'border-gray-900 bg-gray-900 text-white'
                                                         : 'border-gray-200 text-gray-600 hover:border-gray-400'
                                                         }`}
@@ -175,7 +177,7 @@ export default function DetailsPage({ id }) {
                                                 <button
                                                     key={size}
                                                     onClick={() => setSelectedSize(size)}
-                                                    className={`px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all ${selectedSize === size
+                                                    className={`px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all cursor-pointer ${selectedSize === size
                                                         ? 'border-gray-900 bg-gray-900 text-white'
                                                         : 'border-gray-200 text-gray-600 hover:border-gray-400'
                                                         }`}

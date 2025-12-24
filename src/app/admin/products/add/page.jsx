@@ -18,7 +18,9 @@ export default function AddProductPage() {
         stock: 10,
         isFeatured: false,
         colors: "", // Comma separated
-        sizes: ""   // Comma separated
+        sizes: "",   // Comma separated
+        images: "",  // Comma separated
+        video: ""
     });
 
     const handleChange = (e) => {
@@ -41,6 +43,8 @@ export default function AddProductPage() {
                 discount: formData.discount ? Number(formData.discount) : undefined,
                 colors: formData.colors.split(",").map(c => c.trim()).filter(Boolean),
                 sizes: formData.sizes.split(",").map(s => s.trim()).filter(Boolean),
+                images: formData.images.split(",").map(i => i.trim()).filter(Boolean),
+                video: formData.video.trim(),
                 price: Number(formData.newPrice)
             };
             await api.post("/products", payload);
@@ -97,7 +101,6 @@ export default function AddProductPage() {
                     </div>
 
                     <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                         <textarea
                             name="description"
                             required
@@ -106,6 +109,32 @@ export default function AddProductPage() {
                             value={formData.description}
                             onChange={handleChange}
                         />
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Additional Image URLs</label>
+                        <textarea
+                            name="images"
+                            placeholder="https://image1.jpg, https://image2.jpg..."
+                            rows="2"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all resize-none"
+                            value={formData.images}
+                            onChange={handleChange}
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Comma separated list of hosted image URLs</p>
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Video URL (Optional)</label>
+                        <input
+                            type="url"
+                            name="video"
+                            placeholder="https://video.mp4"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all"
+                            value={formData.video}
+                            onChange={handleChange}
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Link to a video file (mp4 preferred)</p>
                     </div>
                 </div>
 
