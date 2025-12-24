@@ -3,6 +3,8 @@ import Link from "next/link";
 import { useStore } from "@/store";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Skeleton from "@/components/ui/Skeleton";
+import { AdminDashboardSkeleton } from "@/components/ui/Skeletons";
 
 export default function AdminLayout({ children }) {
     const { user, loading } = useStore();
@@ -10,32 +12,28 @@ export default function AdminLayout({ children }) {
     const [authorized, setAuthorized] = useState(false);
 
     useEffect(() => {
-        // Strict Guard Logic
-        // 1. If loading, do nothing (wait)
         if (loading) return;
-
-        // 2. If no user -> redirect to login with return url
         if (!user) {
             router.replace("/login?next=/admin");
             return;
         }
-
-        // 3. If user exists but NOT admin -> access denied
         if (user.role !== "admin") {
             router.replace("/");
             return;
         }
-
-        // 4. If all checks pass -> Authorize
         setAuthorized(true);
     }, [user, loading, router]);
 
-    // Show loading spinner until fully authorized
-    // This blocks any partial render of the admin UI
     if (loading || !authorized) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+            <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
+                <aside className="w-full md:w-64 bg-white border-r border-gray-100 flex-shrink-0 p-6 space-y-4">
+                    <Skeleton className="h-8 w-3/4 mb-10" />
+                    {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-10 w-full rounded-lg" />)}
+                </aside>
+                <main className="flex-1 p-4 md:p-8">
+                    <AdminDashboardSkeleton />
+                </main>
             </div>
         );
     }

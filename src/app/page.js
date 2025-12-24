@@ -2,11 +2,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import api from "@/lib/api";
-import { formatPKR } from "@/utils/currency"; // Use PKR
+import { formatPKR } from "@/utils/currency";
 import Hero from "@/components/Hero";
 import Testimonials from "@/components/Testimonials";
 import Newsletter from "@/components/Newsletter";
 import DealsSection from "@/components/DealsSection";
+import { ProductGridSkeleton } from "@/components/ui/Skeletons";
+import Skeleton from "@/components/ui/Skeleton";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -26,17 +28,28 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="bg-white">
+        <Hero />
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <Skeleton className="h-10 w-64 mx-auto mb-8" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-40 sm:h-56 rounded-lg" />)}
+          </div>
+        </section>
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50">
+          <Skeleton className="h-10 w-96 mx-auto mb-8" />
+          <ProductGridSkeleton count={4} />
+        </section>
+      </div>
+    );
+  }
 
-  // 1. Featured (Max 8)
   const featuredProducts = products.filter(p => p.isFeatured).slice(0, 8);
-
-  // 2. Categories Logic: Pick 4 distinct categories
   const allCategories = [...new Set(products.map(p => p.category).filter(Boolean))];
-  // Priority order or just take first 4
   const displayCategories = allCategories.slice(0, 4);
 
-  // Helper to get image for category
   const getCategoryImage = (cat) => {
     const prod = products.find(p => p.category === cat);
     return prod ? prod.image : "https://placehold.co/400";
@@ -46,7 +59,6 @@ export default function Home() {
     <div className="bg-white">
       <Hero />
 
-      {/* 4 Category Tiles in One Row */}
       {displayCategories.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Shop by Category</h2>
@@ -68,7 +80,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* Featured Section */}
       {featuredProducts.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50">
           <h2 className="text-3xl font-extrabold text-gray-900 mb-8 text-center uppercase tracking-wide">Featured Products</h2>
@@ -80,10 +91,8 @@ export default function Home() {
         </section>
       )}
 
-      {/* Deals Section */}
       <DealsSection />
 
-      {/* ALL PRODUCTS GRID (Without Category Sections) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex justify-between items-end mb-8">
           <h2 className="text-3xl font-bold text-gray-900">All Products</h2>
@@ -93,7 +102,7 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
-          {products.slice(0, 20).map((product) => ( // Show first 20 or so, then link to shop
+          {products.slice(0, 20).map((product) => (
             <ProductCard key={product._id} product={product} showCategory={false} />
           ))}
         </div>
@@ -111,7 +120,6 @@ export default function Home() {
   );
 }
 
-// Inline Product Card to control Category Visibility
 function ProductCard({ product, showCategory = false }) {
   if (!product) return null;
 

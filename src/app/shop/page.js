@@ -4,6 +4,8 @@ import api from "@/lib/api";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { formatPKR } from "@/utils/currency";
+import { ProductGridSkeleton } from "@/components/ui/Skeletons";
+import Skeleton from "@/components/ui/Skeleton";
 
 function ShopContent() {
     const [products, setProducts] = useState([]);
@@ -37,16 +39,33 @@ function ShopContent() {
         ? products
         : products.filter(p => p.category === selectedCategory);
 
-    if (loading) return <div className="min-h-screen pt-20 text-center">Loading shop...</div>;
+    if (loading) {
+        return (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <Skeleton className="h-10 w-64 mb-8" />
+                <div className="flex flex-col md:flex-row gap-8">
+                    <div className="w-full md:w-64 flex-shrink-0 space-y-4">
+                        <Skeleton className="h-6 w-32 mb-4" />
+                        {Array.from({ length: 5 }).map((_, i) => (
+                            <Skeleton key={i} className="h-10 w-full" />
+                        ))}
+                    </div>
+                    <div className="flex-1">
+                        <ProductGridSkeleton count={6} />
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4  sm:px-6 lg:px-8 py-12">
             <h1 className="text-3xl font-bold text-gray-900 mb-8">Shop All Products</h1>
 
             <div className="flex flex-col md:flex-row gap-8">
                 {/* Sidebar Filters */}
-                <div className="w-full md:w-64 flex-shrink-0">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Categories</h3>
+                <div className="w-full md:w-64 flex-shrink-0 ">
+                    <h3 className="text-lg font-bold text-gray-900  mb-4">Categories</h3>
                     <div className="space-y-2">
                         {categories.map(cat => (
                             <button
@@ -105,7 +124,12 @@ function ShopContent() {
 
 export default function ShopPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen pt-20 text-center">Loading shop...</div>}>
+        <Suspense fallback={
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <Skeleton className="h-10 w-64 mb-8" />
+                <ProductGridSkeleton count={8} />
+            </div>
+        }>
             <ShopContent />
         </Suspense>
     );

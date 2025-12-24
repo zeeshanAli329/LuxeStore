@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
+import { TableSkeleton } from "@/components/ui/Skeletons";
+import Skeleton from "@/components/ui/Skeleton";
 
 export default function UsersPage() {
     const [users, setUsers] = useState([]);
@@ -21,7 +23,14 @@ export default function UsersPage() {
         fetchUsers();
     }, []);
 
-    if (loading) return <div className="p-8 text-center text-gray-500">Loading users...</div>;
+    if (loading) {
+        return (
+            <div className="p-8">
+                <Skeleton className="h-8 w-32 mb-6" />
+                <TableSkeleton rows={10} columns={4} />
+            </div>
+        );
+    }
 
     return (
         <div>

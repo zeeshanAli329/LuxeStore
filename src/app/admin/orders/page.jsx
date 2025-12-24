@@ -1,7 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import api from "@/lib/api";
-import { formatPKR } from "@/utils/currency"; // Import currency utility
+import { formatPKR } from "@/utils/currency";
+import { TableSkeleton } from "@/components/ui/Skeletons";
+import Skeleton from "@/components/ui/Skeleton";
 
 export default function AdminOrdersPage() {
     const [orders, setOrders] = useState([]);
@@ -25,14 +27,20 @@ export default function AdminOrdersPage() {
     const handleStatusUpdate = async (id, newStatus) => {
         try {
             await api.put(`/orders/${id}/status`, { status: newStatus });
-            // Refresh
             setOrders(prev => prev.map(o => o._id === id ? { ...o, status: newStatus } : o));
         } catch (err) {
             alert("Failed to update status");
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-gray-500">Loading orders...</div>;
+    if (loading) {
+        return (
+            <div className="p-8">
+                <Skeleton className="h-8 w-32 mb-6" />
+                <TableSkeleton rows={10} columns={5} />
+            </div>
+        );
+    }
 
     return (
         <div>
@@ -47,7 +55,6 @@ export default function AdminOrdersPage() {
                                 <th className="px-6 py-4">Total</th>
                                 <th className="px-6 py-4">Status</th>
                                 <th className="px-6 py-4">Date</th>
-                                {/* <th className="px-6 py-4">Actions</th> */}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -84,7 +91,7 @@ export default function AdminOrdersPage() {
                             ))}
                             {orders.length === 0 && (
                                 <tr>
-                                    <td colSpan="6" className="p-12 text-center text-gray-500">No orders found.</td>
+                                    <td colSpan="5" className="p-12 text-center text-gray-500">No orders found.</td>
                                 </tr>
                             )}
                         </tbody>

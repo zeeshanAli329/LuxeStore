@@ -3,16 +3,24 @@
 import Link from "next/link";
 import useProducts from "../ApiFetch"; // correct import
 
+import { ProductGridSkeleton } from "@/components/ui/Skeletons";
+
 const ProductList = () => {
     const { products, error, loading } = useProducts();
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-[50vh] bg-[#f5f5f5]">
-                <p className="text-xl font-medium text-gray-500 animate-pulse">Loading products...</p>
+            <div className="bg-[#f5f5f5] min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex justify-center mb-10">
+                        <div className="h-10 w-64 bg-gray-200 animate-pulse rounded-md" />
+                    </div>
+                    <ProductGridSkeleton count={8} />
+                </div>
             </div>
         );
     }
+
 
     if (error) {
         return (
@@ -33,7 +41,7 @@ const ProductList = () => {
                             key={item.id}
                             className="bg-white rounded-[12px] shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-[1.02] p-4 flex flex-col h-full border border-gray-100"
                         >
-                            <div className="relative h-48 w-full mb-4 flex items-center justify-center overflow-hidden bg-white rounded-md">
+                            <div className="relative h-48 w-full mb-4 flex items-center justify-center overflow-hidden  rounded-md">
                                 {/* Using standard img tag since Next.js Image requires domain config for external URLs */}
                                 <img
                                     src={item.image}

@@ -1,8 +1,9 @@
+@import "./../styles/skeleton.css";
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  /* --foreground: #171717; */
 }
 
 @theme inline {

@@ -3,6 +3,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { formatPKR } from "@/utils/currency";
+import Skeleton from "@/components/ui/Skeleton";
 
 function BuyNowContent() {
     const searchParams = useSearchParams();
@@ -30,7 +31,6 @@ function BuyNowContent() {
 
         const fetchProduct = async () => {
             try {
-                // We use global get product endpoint which is public
                 const res = await api.get(`/products/${productId}`);
                 setProduct(res.data);
             } catch (err) {
@@ -44,8 +44,35 @@ function BuyNowContent() {
         fetchProduct();
     }, [productId]);
 
-    if (loading) return <div className="min-h-screen pt-20 text-center">Loading...</div>;
-    if (!product && !loading) return <div className="min-h-screen pt-20 text-center">Product not found. <button onClick={() => router.push('/')}>Go Home</button></div>;
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm p-8 space-y-8">
+                    <Skeleton className="h-8 w-64" />
+                    <div className="bg-blue-50 p-4 rounded-lg flex items-center gap-4">
+                        <Skeleton className="w-16 h-16 rounded" />
+                        <div className="space-y-2">
+                            <Skeleton className="h-5 w-48" />
+                            <Skeleton className="h-4 w-32" />
+                            <Skeleton className="h-6 w-40" />
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <div className="grid grid-cols-2 gap-4">
+                            <Skeleton className="h-10 w-full" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                    </div>
+                    <Skeleton className="h-14 w-full rounded-xl" />
+                </div>
+            </div>
+        );
+    }
+
+    if (!product && !loading) return <div className="min-h-screen pt-20 text-center">Product not found. <button onClick={() => router.push('/')} className="text-blue-600 underline">Go Home</button></div>;
 
     const quantity = Number(qtyParam) || 1;
     const price = Number(product.newPrice || product.price);
@@ -57,13 +84,12 @@ function BuyNowContent() {
         setError("");
 
         try {
-            // Payload for Guest Order
             const payload = {
                 products: [{
                     product: product._id,
                     quantity,
-                    selectedColor: product.colors?.[0] || "Default", // Simplified for Buy Now
-                    selectedSize: product.sizes?.[0] || "Default",   // Simplified for Buy Now
+                    selectedColor: product.colors?.[0] || "Default",
+                    selectedSize: product.sizes?.[0] || "Default",
                     image: product.image,
                     unitPrice: price
                 }],
@@ -78,7 +104,7 @@ function BuyNowContent() {
                 guestInfo: {
                     name,
                     phone,
-                    email: "" // Optional
+                    email: ""
                 }
             };
 
@@ -111,28 +137,25 @@ function BuyNowContent() {
 
                     <form onSubmit={handlePlaceOrder} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Guest Info */}
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-blue-500 outline-none" placeholder="Ali Khan" />
+                                <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-blue-500 outline-none" placeholder="Ali Khan" disabled={processing} />
                             </div>
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number (Required)</label>
-                                <input type="tel" required value={phone} onChange={e => setPhone(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-blue-500 outline-none" placeholder="0300 1234567" />
+                                <input type="tel" required value={phone} onChange={e => setPhone(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-blue-500 outline-none" placeholder="0300 1234567" disabled={processing} />
                             </div>
-
-                            {/* Address */}
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                                <input type="text" required value={address} onChange={e => setAddress(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-blue-500 outline-none" placeholder="House #, Street..." />
+                                <input type="text" required value={address} onChange={e => setAddress(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-blue-500 outline-none" placeholder="House #, Street..." disabled={processing} />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                                <input type="text" required value={city} onChange={e => setCity(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-blue-500 outline-none" />
+                                <input type="text" required value={city} onChange={e => setCity(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-blue-500 outline-none" disabled={processing} />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
-                                <input type="text" required value={zip} onChange={e => setZip(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-blue-500 outline-none" />
+                                <input type="text" required value={zip} onChange={e => setZip(e.target.value)} className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-blue-500 outline-none" disabled={processing} />
                             </div>
                         </div>
 
@@ -149,7 +172,7 @@ function BuyNowContent() {
                         <button
                             type="submit"
                             disabled={processing}
-                            className={`w-full py-4 rounded-xl font-bold text-white shadow-lg transition-all cursor-pointer ${processing ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 hover:shadow-xl transform hover:-translate-y-1'}`}
+                            className={`w-full py-4 rounded-xl font-bold text-white shadow-lg transition-all cursor-pointer ${processing ? 'opacity-70 cursor-not-allowed bg-gray-400' : 'bg-blue-600 hover:bg-blue-700 hover:shadow-xl transform hover:-translate-y-1'}`}
                         >
                             {processing ? "Processing..." : `Place Order - ${formatPKR(totalAmount)}`}
                         </button>
@@ -162,7 +185,7 @@ function BuyNowContent() {
 
 export default function BuyNowPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50"><Skeleton className="h-96 w-full max-w-3xl rounded-xl" /></div>}>
             <BuyNowContent />
         </Suspense>
     );

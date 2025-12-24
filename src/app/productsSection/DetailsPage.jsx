@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store";
 import { getProductById } from "../../services/productService";
+import { DetailsSkeleton } from "@/components/ui/Skeletons";
 
 export default function DetailsPage({ id }) {
     const [product, setProduct] = useState(null);
@@ -21,24 +22,13 @@ export default function DetailsPage({ id }) {
         router.push("/cart");
     };
 
-
-
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                // Fetch current product details from backend
                 const productData = await getProductById(id);
                 setProduct(productData);
-
-                // Note: Related products logic needs a backend endpoint or filter
-                // For now, we'll just leave it empty or fetch all and filter client side if needed 
-                // but let's effectively skip it to avoid complexity for this turn unless strictly required.
-                // Assuming backend doesn't have "get by category" yet, we can skip or add later.
-                // Or I can add a quick filter by category using getProducts if I had query support.
-                // Let's just set related to empty for now to be safe.
                 setRelatedProducts([]);
-
             } catch (err) {
                 setError(err.message || "Failed to load product");
             } finally {
@@ -52,11 +42,7 @@ export default function DetailsPage({ id }) {
     }, [id]);
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center min-h-screen bg-[#f5f5f5]">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
-            </div>
-        );
+        return <DetailsSkeleton />;
     }
 
     if (error) {
@@ -94,7 +80,7 @@ export default function DetailsPage({ id }) {
                             <img
                                 src={product.image || "/placeholder.png"}
                                 alt={product.title}
-                                className="object-contain max-h-[400px] w-full hover:scale-105 transition-transform duration-500"
+                                className="object-contain max-h-[400px] w-full "
                             />
                         </div>
 
@@ -134,7 +120,6 @@ export default function DetailsPage({ id }) {
                                 <button
                                     onClick={() => {
                                         if (!product) return;
-                                        // Redirect to Guest Checkout / Buy Now page
                                         router.push(`/buy-now?productId=${product._id || product.id}&qty=1`);
                                     }}
                                     className="flex-1 bg-blue-600 text-white px-8 py-4 cursor-pointer rounded-xl font-semibold text-lg hover:bg-blue-700 transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
@@ -145,8 +130,8 @@ export default function DetailsPage({ id }) {
                                 <button
                                     onClick={() => toggleFavorite(product)}
                                     className={`px-4 py-4 rounded-xl border-2 transition-all flex items-center justify-center cursor-pointer ${isFavorite
-                                            ? 'border-red-500 bg-red-50 text-red-500 hover:bg-red-100'
-                                            : 'border-gray-200 text-gray-400 hover:border-red-500 hover:text-red-500'
+                                        ? 'border-red-500 bg-red-50 text-red-500 hover:bg-red-100'
+                                        : 'border-gray-200 text-gray-400 hover:border-red-500 hover:text-red-500'
                                         }`}
                                 >
                                     <svg className={`w-6 h-6 ${isFavorite ? 'fill-current' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -157,8 +142,6 @@ export default function DetailsPage({ id }) {
                         </div>
                     </div>
                 </div>
-
-                {/* Related Products Section omitted for now for simplicity of sync */}
             </div>
         </div>
     );

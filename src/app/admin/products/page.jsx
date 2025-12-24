@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { TableSkeleton } from "@/components/ui/Skeletons";
+import Skeleton from "@/components/ui/Skeleton";
 
 export default function ManageProductsPage() {
     const [products, setProducts] = useState([]);
@@ -37,7 +39,20 @@ export default function ManageProductsPage() {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-gray-500">Loading products...</div>;
+    if (loading) {
+        return (
+            <div className="p-8">
+                <div className="flex justify-between items-center mb-8">
+                    <div>
+                        <Skeleton className="h-8 w-32 mb-2" />
+                        <Skeleton className="h-4 w-48" />
+                    </div>
+                    <Skeleton className="h-10 w-32 rounded-lg" />
+                </div>
+                <TableSkeleton rows={10} columns={5} />
+            </div>
+        );
+    }
 
     return (
         <div>

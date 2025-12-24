@@ -74,7 +74,7 @@ export default function CartPage() {
                                 {/* Actions */}
                                 <button
                                     onClick={() => removeFromCart(product._id)}
-                                    className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                    className="p-2 text-red-500 hover:bg-red-50 cursor-pointer rounded-full transition-colors"
                                     title="Remove item"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,7 +97,7 @@ export default function CartPage() {
                     </div>
                     <button
                         onClick={() => router.push("/checkout")}
-                        className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
+                        className="px-8 py-3 bg-blue-600 cursor-pointer text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
                     >
                         Checkout
                     </button>

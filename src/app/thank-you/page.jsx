@@ -51,10 +51,17 @@ function ThankYouContent() {
     );
 }
 
+import Skeleton from "@/components/ui/Skeleton";
+
 export default function ThankYouPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center p-4">
+                <Skeleton className="h-96 w-full max-w-md rounded-2xl" />
+            </div>
+        }>
             <ThankYouContent />
         </Suspense>
     );
 }
+
