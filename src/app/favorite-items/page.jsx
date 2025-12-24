@@ -13,7 +13,7 @@ export default function Favorites() {
                 <p className="text-lg font-medium">Please login to view your favorites</p>
                 <button
                     onClick={() => router.push("/login")}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="px-6 py-2 cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
                     Login
                 </button>

@@ -91,8 +91,6 @@ export default function Home() {
         </section>
       )}
 
-      <DealsSection />
-
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex justify-between items-end mb-8">
           <h2 className="text-3xl font-bold text-gray-900">All Products</h2>
@@ -113,6 +111,8 @@ export default function Home() {
           </Link>
         </div>
       </section>
+      <DealsSection />
+
 
       <Testimonials />
       <Newsletter />
@@ -125,18 +125,28 @@ function ProductCard({ product, showCategory = false }) {
 
   return (
     <Link href={`/product/${product._id}`} className="group block w-full h-full cursor-pointer bg-white rounded-xl border border-gray-100 hover:shadow-xl transition-shadow flex flex-col">
-      <div className="w-full h-48 bg-gray-200 relative">
+      <div className="w-full h-48 bg-gray-200 relative rounded-t-xl">
         <img
           src={product.image}
           alt={product.title}
-          className="w-full h-full object-center object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-center object-cover rounded-t-xl  transition-transform duration-300"
         />
         {product.discount > 0 && (
-          <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
+          <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded z-10">
             -{product.discount}%
           </span>
         )}
+        {product.stock === 0 ? (
+          <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-20">
+            <span className="bg-gray-900 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Out of Stock</span>
+          </div>
+        ) : product.stock <= 5 ? (
+          <span className="absolute bottom-2 right-2 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider z-10 animate-pulse">
+            Almost sold out
+          </span>
+        ) : null}
       </div>
+
       <div className="p-4 flex flex-col justify-between">
         <div>
           <h3 className="text-sm text-gray-700 font-medium line-clamp-1">{product.title}</h3>

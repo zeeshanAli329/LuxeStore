@@ -70,6 +70,7 @@ export default function Checkout() {
                 products,
                 totalAmount,
                 shippingAddress: {
+                    fullName: user.name, // Logged in user name
                     address,
                     city,
                     postalCode: zip,
@@ -77,6 +78,7 @@ export default function Checkout() {
                     phone,
                 },
             });
+
 
             // Redirect to Thank You page
             router.push(`/thank-you?orderId=${res.data._id}`);

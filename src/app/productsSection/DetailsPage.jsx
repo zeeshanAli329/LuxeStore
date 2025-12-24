@@ -13,12 +13,28 @@ export default function DetailsPage({ id }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { addToCart, favorites, toggleFavorite, user } = useStore();
-    const isFavorite = favorites.some(fav => (fav._id || fav) === (product?._id || product?.id));
     const router = useRouter();
+    const isFavorite = (favorites || []).some(fav => (fav._id || fav) === (product?._id || product?.id));
+
+    const [selectedSize, setSelectedSize] = useState("");
+    const [selectedColor, setSelectedColor] = useState("");
+    const [validationError, setValidationError] = useState("");
 
     const handleAddToCart = () => {
         if (!product) return;
-        addToCart(product);
+
+        // Validation
+        if (product.sizes?.length > 0 && !selectedSize) {
+            setValidationError("Please select a size");
+            return;
+        }
+        if (product.colors?.length > 0 && !selectedColor) {
+            setValidationError("Please select a color");
+            return;
+        }
+
+        setValidationError("");
+        addToCart(product, 1, selectedSize, selectedColor);
         router.push("/cart");
     };
 
@@ -80,7 +96,7 @@ export default function DetailsPage({ id }) {
                             <img
                                 src={product.image || "/placeholder.png"}
                                 alt={product.title}
-                                className="object-contain max-h-[400px] w-full "
+                                className="object-contain max-h-[400px] w-full rounded-xl "
                             />
                         </div>
 
@@ -105,24 +121,103 @@ export default function DetailsPage({ id }) {
                                 )}
                             </div>
 
-                            <p className="text-gray-600 text-lg leading-relaxed mb-8 border-b border-gray-100 pb-8">
+                            <p className="text-gray-600 text-lg leading-relaxed mb-6 border-b border-gray-100 pb-6">
                                 {product.description}
                             </p>
+
+                            {/* Stock Indicator */}
+                            <div className="mb-6">
+                                {product.stock === 0 ? (
+                                    <span className="text-red-600 font-bold flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-red-600"></div>
+                                        Out of stock
+                                    </span>
+                                ) : product.stock <= 5 ? (
+                                    <span className="text-orange-500 font-bold flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
+                                        Almost sold out! Only {product.stock} left
+                                    </span>
+                                ) : (
+                                    <span className="text-green-600 font-medium flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-green-600"></div>
+                                        In Stock ({product.stock} available)
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Variant Selectors */}
+                            <div className="space-y-6 mb-8">
+                                {product.colors?.length > 0 && (
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Color</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {product.colors.map(color => (
+                                                <button
+                                                    key={color}
+                                                    onClick={() => setSelectedColor(color)}
+                                                    className={`px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all ${selectedColor === color
+                                                        ? 'border-gray-900 bg-gray-900 text-white'
+                                                        : 'border-gray-200 text-gray-600 hover:border-gray-400'
+                                                        }`}
+                                                >
+                                                    {color}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {product.sizes?.length > 0 && (
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Size</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {product.sizes.map(size => (
+                                                <button
+                                                    key={size}
+                                                    onClick={() => setSelectedSize(size)}
+                                                    className={`px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all ${selectedSize === size
+                                                        ? 'border-gray-900 bg-gray-900 text-white'
+                                                        : 'border-gray-200 text-gray-600 hover:border-gray-400'
+                                                        }`}
+                                                >
+                                                    {size}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {validationError && (
+                                <p className="text-red-500 text-sm font-medium mb-4 animate-bounce">
+                                    ⚠️ {validationError}
+                                </p>
+                            )}
 
                             <div className="flex gap-4 flex-col sm:flex-row">
                                 <button
                                     onClick={handleAddToCart}
-                                    className="flex-1 bg-gray-900 text-white px-8 py-4 cursor-pointer rounded-xl font-semibold text-lg hover:bg-gray-800 transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
+                                    disabled={product.stock === 0}
+                                    className={`flex-1 px-8 py-4 cursor-pointer rounded-xl font-semibold text-lg transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-xl ${product.stock === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-900 text-white hover:bg-gray-800'}`}
                                 >
-                                    Add to Cart
+                                    {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
                                 </button>
 
                                 <button
                                     onClick={() => {
                                         if (!product) return;
-                                        router.push(`/buy-now?productId=${product._id || product.id}&qty=1`);
+                                        if (product.sizes?.length > 0 && !selectedSize) {
+                                            setValidationError("Please select a size");
+                                            return;
+                                        }
+                                        if (product.colors?.length > 0 && !selectedColor) {
+                                            setValidationError("Please select a color");
+                                            return;
+                                        }
+                                        router.push(`/buy-now?productId=${product._id || product.id}&qty=1${selectedSize ? `&size=${selectedSize}` : ''}${selectedColor ? `&color=${selectedColor}` : ''}`);
                                     }}
-                                    className="flex-1 bg-blue-600 text-white px-8 py-4 cursor-pointer rounded-xl font-semibold text-lg hover:bg-blue-700 transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
+                                    disabled={product.stock === 0}
+                                    className={`flex-1 px-8 py-4 cursor-pointer rounded-xl font-semibold text-lg transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-xl ${product.stock === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
                                 >
                                     Buy Now
                                 </button>

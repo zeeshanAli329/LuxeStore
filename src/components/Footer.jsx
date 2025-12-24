@@ -7,7 +7,7 @@ export default function Footer() {
     return (
         <footer className="bg-gray-900 text-white pt-16 pb-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-12 flex flex-col md:flex-row space-between">
                     {/* Brand Column */}
                     <div>
                         {/* <Link href="/" className=" mb-10 ">
@@ -54,33 +54,67 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Links Column 1 */}
-                    <div>
-                        <h3 className="text-lg font-bold mb-6">Shop</h3>
-                        <ul className="space-y-4">
-                            {['New Arrivals', 'Best Sellers', 'Men', 'Women', 'Electronics', 'Accessories'].map((item) => (
-                                <li key={item}>
-                                    <Link href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-                                        {item}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Links Column 2 */}
                     <div>
                         <h3 className="text-lg font-bold mb-6">Support</h3>
                         <ul className="space-y-4">
-                            {['Contact Us', 'FAQ', 'Shipping & Returns', 'Order Tracking', 'Privacy Policy', 'Terms of Service'].map((item) => (
-                                <li key={item}>
-                                    <Link href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-                                        {item}
-                                    </Link>
-                                </li>
-                            ))}
+                            <li>
+                                <Link href="/contact" className="text-gray-400 hover:text-blue-400 transition-colors">
+                                    Contact Us
+                                </Link>
+                            </li>
+
+                            <li>
+                                <a
+                                    href="/PDF's/FAQ.pdf"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-gray-400 hover:text-blue-400 transition-colors"
+                                >
+                                    FAQ
+                                </a>
+                            </li>
+
+                            <li>
+                                <a
+                                    href="/PDF's/Shipping-and-Returns.pdf"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-gray-400 hover:text-blue-400 transition-colors"
+                                >
+                                    Shipping & Returns
+                                </a>
+                            </li>
+
+                            {/* <li>
+                                <Link href="/order-tracking" className="text-gray-400 hover:text-blue-400 transition-colors">
+                                    Order Tracking
+                                </Link>
+                            </li> */}
+
+                            <li>
+                                <a
+                                    href="/PDF's/Privacy-Policy.pdf"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-gray-400 hover:text-blue-400 transition-colors"
+                                >
+                                    Privacy Policy
+                                </a>
+                            </li>
+
+                            <li>
+                                <a
+                                    href="/PDF's/Terms-of-Service.pdf"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-gray-400 hover:text-blue-400 transition-colors"
+                                >
+                                    Terms of Service
+                                </a>
+                            </li>
                         </ul>
                     </div>
+
 
                     {/* Contact Column */}
                     <div>
@@ -97,7 +131,7 @@ export default function Footer() {
                                 <svg className="w-6 h-6 mr-3 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                 </svg>
-                                <span>support@luxestore.com</span>
+                                <span>luxestore@gmail.com</span>
                             </li>
                             <li className="flex items-center">
                                 <svg className="w-6 h-6 mr-3 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,22 +143,10 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-center items-center">
                     <p className="text-gray-500 text-sm mb-4 md:mb-0">
                         &copy; 2025 LuxeStore. All rights reserved.
                     </p>
-                    <div className="flex space-x-6">
-                        {/* Payment Icons */}
-                        <div className="h-8 bg-gray-800 rounded px-2 flex items-center justify-center">
-                            <span className="text-xs font-bold text-gray-400">VISA</span>
-                        </div>
-                        <div className="h-8 bg-gray-800 rounded px-2 flex items-center justify-center">
-                            <span className="text-xs font-bold text-gray-400">MC</span>
-                        </div>
-                        <div className="h-8 bg-gray-800 rounded px-2 flex items-center justify-center">
-                            <span className="text-xs font-bold text-gray-400">PAYPAL</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </footer>

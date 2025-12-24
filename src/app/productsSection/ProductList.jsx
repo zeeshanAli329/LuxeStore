@@ -46,9 +46,19 @@ const ProductList = () => {
                                 <img
                                     src={item.image}
                                     alt={item.title}
-                                    className="object-contain h-full w-full max-h-44"
+                                    className="object-contain h-full w-full max-h-44 rounded-xl"
                                 />
+                                {item.stock === 0 ? (
+                                    <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-10">
+                                        <span className="bg-gray-900 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Out of Stock</span>
+                                    </div>
+                                ) : item.stock <= 5 ? (
+                                    <span className="absolute bottom-2 right-2 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider z-10 animate-pulse">
+                                        Almost sold out
+                                    </span>
+                                ) : null}
                             </div>
+
 
                             <div className="flex flex-col flex-grow">
                                 <h3 className="text-base font-bold leading-snug mb-2 line-clamp-2 min-h-[2.5rem]" title={item.title}>

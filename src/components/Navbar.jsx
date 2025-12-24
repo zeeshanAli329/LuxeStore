@@ -100,7 +100,7 @@ export default function Navbar() {
 
                         <button
                             onClick={() => user ? router.push("/favorite-items") : router.push("/login?next=/favorite-items")}
-                            className="text-gray-500 hover:text-blue-600 transition-colors transform hover:scale-110"
+                            className="text-gray-500 hover:text-blue-600 transition-colors transform hover:scale-110 cursor-pointer"
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -109,7 +109,7 @@ export default function Navbar() {
 
                         <button
                             onClick={() => user ? router.push("/cart") : router.push("/login?next=/cart")}
-                            className="text-gray-500 hover:text-blue-600 transition-colors relative transform hover:scale-110"
+                            className="text-gray-500 hover:text-blue-600 transition-colors relative transform hover:scale-110 cursor-pointer"
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -122,7 +122,7 @@ export default function Navbar() {
                         </button>
 
                         {!user ? (
-                            <button onClick={() => router.push("/login")} className="text-gray-500 hover:text-blue-600 transition-colors transform hover:scale-110">
+                            <button onClick={() => router.push("/login")} className="text-gray-500 hover:text-blue-600 transition-colors transform hover:scale-110 cursor-pointer">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
@@ -140,7 +140,7 @@ export default function Navbar() {
                         {/* Cart Icon */}
                         <button
                             onClick={() => user ? router.push("/cart") : router.push("/login?next=/cart")}
-                            className="text-gray-500 hover:text-blue-600 transition-colors relative"
+                            className="text-gray-500 hover:text-blue-600 transition-colors relative cursor-pointer"
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -160,7 +160,7 @@ export default function Navbar() {
                         </Link>
 
                         {/* Hamburger Button */}
-                        <button onClick={() => setIsMenuOpen(true)} className="text-gray-500 hover:text-gray-900 focus:outline-none p-2 z-50">
+                        <button onClick={() => setIsMenuOpen(true)} className="text-gray-500 hover:text-gray-900 focus:outline-none p-2 z-50 cursor-pointer">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
@@ -183,7 +183,7 @@ export default function Navbar() {
                         {/* Drawer Header */}
                         <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                             <span className="text-lg font-bold text-gray-900">Menu</span>
-                            <button onClick={handleMenuClose} className="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-200 transition-colors">
+                            <button onClick={handleMenuClose} className="p-2 text-gray-500 hover:text-gray-900 rounded-full cursor-pointer hover:bg-gray-200 transition-colors">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
@@ -225,7 +225,7 @@ export default function Navbar() {
                                 {!user ? (
                                     <Link
                                         href="/login"
-                                        className="flex items-center gap-3 px-4 py-3 rounded-lg text-lg font-medium text-gray-800 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                        className="flex items-center gap-3 cursor-pointer px-4 py-3 rounded-lg text-lg font-medium text-gray-800 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                                         onClick={handleMenuClose}
                                     >
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,7 +237,7 @@ export default function Navbar() {
                                     <>
                                         <Link
                                             href="/profile"
-                                            className="flex items-center gap-3 px-4 py-3 rounded-lg text-lg font-medium text-gray-800 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                            className="flex items-center cursor-pointer gap-3 px-4 py-3 rounded-lg text-lg font-medium text-gray-800 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                                             onClick={handleMenuClose}
                                         >
                                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,7 +250,7 @@ export default function Navbar() {
                                                 logout();
                                                 handleMenuClose();
                                             }}
-                                            className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg text-lg font-medium text-red-500 hover:bg-red-50 transition-colors"
+                                            className="w-full text-left cursor-pointer flex items-center gap-3 px-4 py-3 rounded-lg text-lg font-medium text-red-500 hover:bg-red-50 transition-colors"
                                         >
                                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

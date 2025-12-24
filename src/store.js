@@ -57,22 +57,20 @@ export function StoreProvider({ children }) {
         router.replace("/login");
     };
 
-    const addToCart = async (product, quantity = 1) => {
+    const addToCart = async (product, quantity = 1, selectedSize = null, selectedColor = null) => {
         if (!user) {
-            // Strict rule: No navigation in providers.
-            // Component should handle redirection if needed, or we just alert here.
             alert("Please login to add items to cart");
             return;
         }
 
         try {
-            const updatedCart = await apiAddToCart(product._id || product.id, quantity);
+            const updatedCart = await apiAddToCart(product._id || product.id, quantity, selectedSize, selectedColor);
             setCart(updatedCart);
-            // alert("Added to cart!"); // Optional feedback
         } catch (err) {
             console.error("Add to cart failed", err);
         }
     };
+
 
     const removeFromCart = async (productId) => {
         if (!user) return;

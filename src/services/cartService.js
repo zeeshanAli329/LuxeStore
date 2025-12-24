@@ -7,10 +7,11 @@ export const getCart = async () => {
 };
 
 // Add to Cart
-export const addToCart = async (productId, quantity) => {
-    const response = await api.post("/users/cart", { productId, quantity });
+export const addToCart = async (productId, quantity, selectedSize = null, selectedColor = null) => {
+    const response = await api.post("/users/cart", { productId, quantity, selectedSize, selectedColor });
     return response.data;
 };
+
 
 // Remove from Cart
 export const removeFromCart = async (productId) => {

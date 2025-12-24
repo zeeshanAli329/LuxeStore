@@ -72,7 +72,7 @@ function LoginForm() {
 
         {showDebug && (
           <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 text-xs font-mono">
-            <button onClick={testConnection} disabled={testing} className="bg-blue-600 text-white px-2 py-1 rounded">
+            <button onClick={testConnection} disabled={testing} className="bg-blue-600 text-white px-2 py-1 cursor-pointer rounded">
               {testing ? "Testing..." : "Test Connection"}
             </button>
           </div>
@@ -105,7 +105,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`group relative flex w-full justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white hover:bg-indigo-500 ${isSubmitting ? 'opacity-70' : ''}`}
+            className={`group relative cursor-pointer flex w-full justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white hover:bg-indigo-500 ${isSubmitting ? 'opacity-70' : ''}`}
           >
             {isSubmitting ? "Signing in..." : "Sign in"}
           </button>

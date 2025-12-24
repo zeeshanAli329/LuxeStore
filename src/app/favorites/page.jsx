@@ -65,7 +65,7 @@ export default function FavoritesPage() {
 
                                     <button
                                         onClick={() => toggleFavorite(product)}
-                                        className="absolute top-2 right-2 p-2 bg-white rounded-full shadow hover:bg-gray-100 transition-colors text-red-500 cursor-pointer z-10"
+                                        className="absolute top-2 right-2 p-2 bg-white rounded-full shadow hover:bg-gray-100 cursor-pointer transition-colors text-red-500 cursor-pointer z-10"
                                         title="Remove from favorites"
                                     >
                                         <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">

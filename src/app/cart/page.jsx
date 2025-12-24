@@ -62,8 +62,14 @@ export default function CartPage() {
                                 <div className="flex-1">
                                     <h2 className="font-semibold text-gray-900">{product.title}</h2>
                                     <p className="text-gray-500 text-sm">Category: {product.category}</p>
+                                    {(item.selectedColor || item.selectedSize) && (
+                                        <p className="text-gray-600 text-xs mt-1">
+                                            Variants: {item.selectedColor} {item.selectedSize}
+                                        </p>
+                                    )}
                                     <p className="font-medium text-blue-600 mt-1">${product.newPrice?.toFixed(2) || product.price?.toFixed(2)}</p>
                                 </div>
+
 
                                 {/* Quantity */}
                                 <div className="flex items-center gap-3">

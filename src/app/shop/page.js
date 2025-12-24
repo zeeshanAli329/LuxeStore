@@ -90,11 +90,11 @@ function ShopContent() {
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                             {filteredProducts.map(product => (
                                 <Link key={product._id} href={`/product/${product._id}`} className="group block w-full bg-white rounded-xl border border-gray-100 hover:shadow-lg transition-shadow">
-                                    <div className="w-full h-48 bg-gray-200 relative">
+                                    <div className="w-full h-48 bg-gray-200 relative rounded-xl">
                                         <img
                                             src={product.image || "https://placehold.co/400"}
                                             alt={product.title}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            className="w-full h-full object-cover  transition-transform duration-300  rounded-t-xl"
                                         />
                                         {product.discount > 0 && (
                                             <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">

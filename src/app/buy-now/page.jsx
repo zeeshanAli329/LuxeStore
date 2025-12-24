@@ -10,8 +10,11 @@ function BuyNowContent() {
     const router = useRouter();
     const productId = searchParams.get("productId");
     const qtyParam = searchParams.get("qty");
+    const selectedSize = searchParams.get("size");
+    const selectedColor = searchParams.get("color");
 
     const [product, setProduct] = useState(null);
+
     const [loading, setLoading] = useState(true);
     const [processing, setProcessing] = useState(false);
     const [error, setError] = useState("");
@@ -88,19 +91,22 @@ function BuyNowContent() {
                 products: [{
                     product: product._id,
                     quantity,
-                    selectedColor: product.colors?.[0] || "Default",
-                    selectedSize: product.sizes?.[0] || "Default",
+                    selectedColor: selectedColor || "Default",
+                    selectedSize: selectedSize || "Default",
                     image: product.image,
                     unitPrice: price
                 }],
+
                 totalAmount,
                 shippingAddress: {
+                    fullName: name,
                     address,
                     city,
                     postalCode: zip,
                     country: "Pakistan",
                     phone
                 },
+
                 guestInfo: {
                     name,
                     phone,
@@ -130,9 +136,13 @@ function BuyNowContent() {
                         <img src={product.image} className="w-16 h-16 object-cover rounded" alt={product.title} />
                         <div>
                             <h3 className="font-bold text-gray-900">{product.title}</h3>
-                            <p className="text-sm text-gray-600">{formatPKR(price)} x {quantity}</p>
+                            <p className="text-sm text-gray-600">
+                                {formatPKR(price)} x {quantity}
+                                {(selectedSize || selectedColor) && ` | ${selectedSize || ''} ${selectedColor || ''}`}
+                            </p>
                             <p className="font-bold text-lg text-blue-700">Total: {formatPKR(totalAmount)}</p>
                         </div>
+
                     </div>
 
                     <form onSubmit={handlePlaceOrder} className="space-y-6">

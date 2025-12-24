@@ -16,7 +16,9 @@ export default function AddProductPage() {
         discount: "",
         category: "electronics",
         stock: 10,
-        isFeatured: false
+        isFeatured: false,
+        colors: "", // Comma separated
+        sizes: ""   // Comma separated
     });
 
     const handleChange = (e) => {
@@ -31,18 +33,26 @@ export default function AddProductPage() {
         e.preventDefault();
         setLoading(true);
         try {
-            await api.post("/products", {
+            const payload = {
                 ...formData,
-                price: formData.newPrice // Ensure compatibility if model expects "price"
-            });
+                oldPrice: formData.oldPrice ? Number(formData.oldPrice) : Number(formData.newPrice),
+                newPrice: Number(formData.newPrice),
+                stock: Number(formData.stock),
+                discount: formData.discount ? Number(formData.discount) : undefined,
+                colors: formData.colors.split(",").map(c => c.trim()).filter(Boolean),
+                sizes: formData.sizes.split(",").map(s => s.trim()).filter(Boolean),
+                price: Number(formData.newPrice)
+            };
+            await api.post("/products", payload);
             router.push("/admin/products");
         } catch (error) {
             console.error(error);
-            alert("Failed to create product. Check valid image URL or missing fields.");
+            alert("Failed to create product.");
         } finally {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="max-w-3xl mx-auto">
@@ -163,7 +173,35 @@ export default function AddProductPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Available Colors</label>
+                        <input
+                            type="text"
+                            name="colors"
+                            placeholder="Black, White, Blue"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none"
+                            value={formData.colors}
+                            onChange={handleChange}
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Comma separated list</p>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Available Sizes</label>
+                        <input
+                            type="text"
+                            name="sizes"
+                            placeholder="S, M, L, XL"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none"
+                            value={formData.sizes}
+                            onChange={handleChange}
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Comma separated list</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+
                         <select
                             name="category"
                             className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none bg-white"

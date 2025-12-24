@@ -32,6 +32,28 @@ exports.createOrder = async (req, res) => {
             return res.status(400).json({ message: "Complete shipping address and phone are required" });
         }
 
+        // Stock Check & Variant Validation
+        const Product = require("../models/Product");
+        for (const item of products) {
+            const product = await Product.findById(item.product);
+            if (!product) {
+                return res.status(404).json({ message: `Product ${item.product} not found` });
+            }
+
+            // Check Stock
+            if (product.stock < item.quantity) {
+                return res.status(400).json({ message: `Insufficient stock for ${product.title}. Only ${product.stock} left.` });
+            }
+
+            // Variant Validation (If product has sizes/colors, selection is required)
+            if (product.sizes && product.sizes.length > 0 && !item.selectedSize) {
+                return res.status(400).json({ message: `Please select a size for ${product.title}` });
+            }
+            if (product.colors && product.colors.length > 0 && !item.selectedColor) {
+                return res.status(400).json({ message: `Please select a color for ${product.title}` });
+            }
+        }
+
         // Create the Order
         const order = await Order.create({
             user: req.user ? req.user._id : undefined,
@@ -49,6 +71,16 @@ exports.createOrder = async (req, res) => {
             paymentMethod: "COD",
             paymentStatus: "Pending",
         });
+
+        // Reduce Stock
+        if (order) {
+            for (const item of products) {
+                await Product.findByIdAndUpdate(item.product, {
+                    $inc: { stock: -item.quantity }
+                });
+            }
+        }
+
 
         console.log("[Order] Created Successfully:", order._id);
 
@@ -115,6 +147,32 @@ exports.getAllOrders = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// UPDATE ORDER STATUS (ADMIN)
+exports.updateOrderStatus = async (req, res) => {
+    try {
+        const { status } = req.body;
+        const allowedStatuses = ["Pending", "Confirmed", "Shipped", "Delivered", "Cancelled"];
+
+        if (!allowedStatuses.includes(status)) {
+            return res.status(400).json({ message: "Invalid status value" });
+        }
+
+        const order = await Order.findById(req.params.id);
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        order.status = status;
+        await order.save({ validateBeforeSave: false });
+
+        res.json(order);
+    } catch (error) {
+        console.error("Update Order Status Error:", error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
 
 // DEPRECATED: Points to unified createOrder
 exports.createGuestOrder = async (req, res) => {

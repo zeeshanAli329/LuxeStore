@@ -26,10 +26,11 @@ export default function AdminOrdersPage() {
 
     const handleStatusUpdate = async (id, newStatus) => {
         try {
-            await api.put(`/orders/${id}/status`, { status: newStatus });
+            await api.patch(`/orders/${id}/status`, { status: newStatus });
             setOrders(prev => prev.map(o => o._id === id ? { ...o, status: newStatus } : o));
         } catch (err) {
-            alert("Failed to update status");
+            const msg = err.response?.data?.message || "Failed to update status";
+            alert(msg);
         }
     };
 
@@ -54,6 +55,7 @@ export default function AdminOrdersPage() {
                                 <th className="px-6 py-4">User</th>
                                 <th className="px-6 py-4">Total</th>
                                 <th className="px-6 py-4">Status</th>
+                                <th className="px-6 py-4">Items</th>
                                 <th className="px-6 py-4">Date</th>
                             </tr>
                         </thead>
@@ -65,9 +67,13 @@ export default function AdminOrdersPage() {
                                         <div className="text-xs text-gray-400 mt-1">{order.paymentMethod}</div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="text-sm font-medium text-gray-900">{order.user?.name || "Guest"}</div>
-                                        <div className="text-xs text-gray-500">{order.user?.email}</div>
-                                        <div className="text-xs text-blue-500">{order.shippingAddress?.phone}</div>
+                                        <div className="text-sm font-bold text-gray-900">{order.shippingAddress?.fullName || order.user?.name || "Guest"}</div>
+                                        <div className="text-[11px] text-gray-500 leading-tight mt-1">
+                                            {order.shippingAddress?.address}, {order.shippingAddress?.city}
+                                            <br />
+                                            CP: {order.shippingAddress?.postalCode}
+                                        </div>
+                                        <div className="text-xs font-semibold text-blue-600 mt-1">{order.shippingAddress?.phone}</div>
                                     </td>
                                     <td className="px-6 py-4 text-sm font-bold text-gray-900">{formatPKR(order.totalAmount)}</td>
                                     <td className="px-6 py-4">
@@ -85,6 +91,20 @@ export default function AdminOrdersPage() {
                                             <option value="Delivered">Delivered</option>
                                             <option value="Cancelled">Cancelled</option>
                                         </select>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="space-y-1">
+                                            {order.products?.map((item, i) => (
+                                                <div key={i} className="text-[10px] leading-tight text-gray-600 bg-gray-50 p-1 rounded border border-gray-100">
+                                                    <span className="font-bold">{item.quantity}x</span> {item.product?.title || "Product"}
+                                                    {(item.selectedColor || item.selectedSize) && (
+                                                        <span className="text-blue-600 font-medium ml-1">
+                                                            ({item.selectedColor || '-'}, {item.selectedSize || '-'})
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</td>
                                 </tr>

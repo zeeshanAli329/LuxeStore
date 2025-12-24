@@ -71,7 +71,7 @@ export default function Signup() {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className={`group relative flex w-full justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white hover:bg-indigo-500 ${isSubmitting ? 'opacity-70' : ''}`}
+                        className={`group relative flex w-full cursor-pointer justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white hover:bg-indigo-500 ${isSubmitting ? 'opacity-70' : ''}`}
                     >
                         {isSubmitting ? "Creating account..." : "Sign up"}
                     </button>

@@ -48,6 +48,7 @@ const orderSchema = new mongoose.Schema(
             enum: ["Pending", "Paid", "Failed"],
         },
         shippingAddress: {
+            fullName: { type: String, required: true },
             address: { type: String, required: true },
             city: { type: String, required: true },
             postalCode: { type: String, required: true },

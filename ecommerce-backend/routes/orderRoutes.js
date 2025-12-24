@@ -3,6 +3,7 @@ const {
     createOrder,
     getMyOrders,
     getAllOrders,
+    updateOrderStatus,
     createGuestOrder,
     testEmail
 } = require("../controllers/orderController");
@@ -16,5 +17,6 @@ router.get("/myorders", protect, getMyOrders);
 router.post("/guest", createGuestOrder); // Public route
 router.get("/test-email", protect, admin, testEmail); // Admin only test
 router.get("/", protect, admin, getAllOrders);
+router.patch("/:id/status", protect, admin, updateOrderStatus);
 
 module.exports = router;

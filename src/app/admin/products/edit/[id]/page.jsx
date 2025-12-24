@@ -25,7 +25,9 @@ export default function EditProductPage({ params }) {
         discount: "",
         category: "",
         stock: 0,
-        isFeatured: false
+        isFeatured: false,
+        colors: "", // comma separated
+        sizes: ""   // comma separated
     });
 
     useEffect(() => {
@@ -42,7 +44,9 @@ export default function EditProductPage({ params }) {
                     discount: p.discount || "",
                     category: p.category,
                     stock: p.stock,
-                    isFeatured: p.isFeatured
+                    isFeatured: p.isFeatured,
+                    colors: (p.colors || []).join(", "),
+                    sizes: (p.sizes || []).join(", ")
                 });
             } catch (error) {
                 console.error("Failed to fetch product", error);
@@ -70,7 +74,17 @@ export default function EditProductPage({ params }) {
         e.preventDefault();
         setSubmitting(true);
         try {
-            await api.put(`/products/${id}`, formData);
+            const payload = {
+                ...formData,
+                oldPrice: formData.oldPrice ? Number(formData.oldPrice) : Number(formData.newPrice),
+                newPrice: Number(formData.newPrice),
+                stock: Number(formData.stock),
+                discount: formData.discount ? Number(formData.discount) : undefined,
+                colors: formData.colors.split(",").map(c => c.trim()).filter(Boolean),
+                sizes: formData.sizes.split(",").map(s => s.trim()).filter(Boolean),
+                price: Number(formData.newPrice)
+            };
+            await api.put(`/products/${id}`, payload);
             router.push("/admin/products");
         } catch (error) {
             console.error(error);
@@ -79,6 +93,7 @@ export default function EditProductPage({ params }) {
             setSubmitting(false);
         }
     };
+
 
     if (loading) return <div className="p-8 text-center text-gray-500">Loading product...</div>;
 
@@ -192,7 +207,35 @@ export default function EditProductPage({ params }) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Available Colors</label>
+                        <input
+                            type="text"
+                            name="colors"
+                            placeholder="Black, White, Blue"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none"
+                            value={formData.colors}
+                            onChange={handleChange}
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Comma separated list</p>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Available Sizes</label>
+                        <input
+                            type="text"
+                            name="sizes"
+                            placeholder="S, M, L, XL"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none"
+                            value={formData.sizes}
+                            onChange={handleChange}
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Comma separated list</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+
                         <select
                             name="category"
                             className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none bg-white"
