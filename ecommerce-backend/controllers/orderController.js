@@ -84,6 +84,21 @@ exports.createOrder = async (req, res) => {
 
         console.log("[Order] Created Successfully:", order._id);
 
+        // CREATE NOTIFICATION (Non-blocking)
+        try {
+            const Notification = require("../models/Notification");
+            await Notification.create({
+                type: "ORDER_PLACED",
+                message: `New Order #${order._id.toString().slice(-6)} placed by ${order.shippingAddress.fullName}`,
+                meta: {
+                    orderId: order._id,
+                    userId: req.user ? req.user._id : undefined
+                }
+            });
+        } catch (notifError) {
+            console.error("[Order] Notification creation failed:", notifError.message);
+        }
+
         // Send Email (Non-blocking)
         try {
             const { sendOrderEmail } = require("../utils/mailer");

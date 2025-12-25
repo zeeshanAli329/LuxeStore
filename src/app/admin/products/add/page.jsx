@@ -80,7 +80,7 @@ export default function AddProductPage() {
                             type="text"
                             name="title"
                             required
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                             value={formData.title}
                             onChange={handleChange}
                         />
@@ -93,7 +93,7 @@ export default function AddProductPage() {
                             name="image"
                             required
                             placeholder="https://..."
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                             value={formData.image}
                             onChange={handleChange}
                         />
@@ -105,7 +105,7 @@ export default function AddProductPage() {
                             name="description"
                             required
                             rows="4"
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all resize-none"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
                             value={formData.description}
                             onChange={handleChange}
                         />
@@ -117,7 +117,7 @@ export default function AddProductPage() {
                             name="images"
                             placeholder="https://image1.jpg, https://image2.jpg..."
                             rows="2"
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all resize-none"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
                             value={formData.images}
                             onChange={handleChange}
                         />
@@ -130,7 +130,7 @@ export default function AddProductPage() {
                             type="url"
                             name="video"
                             placeholder="https://video.mp4"
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                             value={formData.video}
                             onChange={handleChange}
                         />
@@ -151,7 +151,7 @@ export default function AddProductPage() {
                                 name="oldPrice"
                                 min="0"
                                 step="0.01"
-                                className="w-full pl-7 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none"
+                                className="w-full pl-7 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                                 value={formData.oldPrice}
                                 onChange={handleChange}
                             />
@@ -167,7 +167,7 @@ export default function AddProductPage() {
                                 required
                                 min="0"
                                 step="0.01"
-                                className="w-full pl-7 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none"
+                                className="w-full pl-7 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                                 value={formData.newPrice}
                                 onChange={handleChange}
                             />
@@ -180,7 +180,7 @@ export default function AddProductPage() {
                             name="stock"
                             required
                             min="0"
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             value={formData.stock}
                             onChange={handleChange}
                         />
@@ -207,7 +207,7 @@ export default function AddProductPage() {
                             type="text"
                             name="colors"
                             placeholder="Black, White, Blue"
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             value={formData.colors}
                             onChange={handleChange}
                         />
@@ -219,7 +219,7 @@ export default function AddProductPage() {
                             type="text"
                             name="sizes"
                             placeholder="S, M, L, XL"
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             value={formData.sizes}
                             onChange={handleChange}
                         />
@@ -233,7 +233,7 @@ export default function AddProductPage() {
 
                         <select
                             name="category"
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none bg-white"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer"
                             value={formData.category}
                             onChange={handleChange}
                         >
@@ -249,7 +249,7 @@ export default function AddProductPage() {
                             <input
                                 type="checkbox"
                                 name="isFeatured"
-                                className="w-5 h-5 text-gray-900 rounded border-gray-300 focus:ring-gray-900"
+                                className="w-5 h-5 text-blue-600 bg-gray-800 border-gray-700 rounded focus:ring-blue-500 cursor-pointer"
                                 checked={formData.isFeatured}
                                 onChange={handleChange}
                             />

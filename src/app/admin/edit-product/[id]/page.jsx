@@ -85,7 +85,7 @@ export default function EditProductPage({ params }) {
                         type="url"
                         name="image"
                         required
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                         value={formData.image}
                         onChange={handleChange}
                     />
@@ -98,7 +98,7 @@ export default function EditProductPage({ params }) {
                         type="text"
                         name="title"
                         required
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                         value={formData.title}
                         onChange={handleChange}
                     />
@@ -111,7 +111,7 @@ export default function EditProductPage({ params }) {
                         name="description"
                         required
                         rows="4"
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                         value={formData.description}
                         onChange={handleChange}
                     />
@@ -127,7 +127,7 @@ export default function EditProductPage({ params }) {
                             required
                             min="0"
                             step="0.01"
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             value={formData.oldPrice}
                             onChange={handleChange}
                         />
@@ -140,7 +140,7 @@ export default function EditProductPage({ params }) {
                             required
                             min="0"
                             step="0.01"
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             value={formData.newPrice}
                             onChange={handleChange}
                         />
@@ -152,7 +152,7 @@ export default function EditProductPage({ params }) {
                             name="discount"
                             min="0"
                             max="100"
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             value={formData.discount}
                             onChange={handleChange}
                             placeholder="Auto"
@@ -166,7 +166,7 @@ export default function EditProductPage({ params }) {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                         <select
                             name="category"
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer"
                             value={formData.category}
                             onChange={handleChange}
                         >
@@ -184,7 +184,7 @@ export default function EditProductPage({ params }) {
                             name="stock"
                             required
                             min="0"
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             value={formData.stock}
                             onChange={handleChange}
                         />
@@ -197,7 +197,7 @@ export default function EditProductPage({ params }) {
                         type="checkbox"
                         name="isFeatured"
                         id="isFeatured"
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-blue-600 bg-gray-800 border-gray-700 rounded focus:ring-blue-500 cursor-pointer"
                         checked={formData.isFeatured}
                         onChange={handleChange}
                     />

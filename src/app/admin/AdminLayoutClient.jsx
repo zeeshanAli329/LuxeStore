@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Skeleton from "@/components/ui/Skeleton";
 import { AdminDashboardSkeleton } from "@/components/ui/Skeletons";
+import AdminNotifications from "./AdminNotifications";
 
 export default function AdminLayoutClient({ children }) {
     const { user, loading } = useStore();
@@ -47,8 +48,9 @@ export default function AdminLayoutClient({ children }) {
                 </div>
 
                 {/* Mobile Header (visible only on small screens) */}
-                <div className="md:hidden p-4 border-b border-gray-100 flex justify-between items-center">
+                <div className="md:hidden p-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-40">
                     <span className="font-bold text-gray-900">Admin Menu</span>
+                    <AdminNotifications />
                 </div>
 
                 <nav className="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-100px)] md:max-h-full">
@@ -67,9 +69,21 @@ export default function AdminLayoutClient({ children }) {
             </aside>
 
             {/* Main Content Area */}
-            <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-                {children}
-            </main>
+            <div className="flex-1 flex flex-col min-w-0">
+                {/* Desktop Top Header */}
+                <header className="hidden md:flex h-16 bg-white border-b border-gray-100 items-center justify-between px-8 sticky top-0 z-30">
+                    <div className="flex items-center space-x-4">
+                        <h1 className="text-lg font-semibold text-gray-800">LuxeStore Dashboard</h1>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                        <AdminNotifications />
+                    </div>
+                </header>
+
+                <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+                    {children}
+                </main>
+            </div>
         </div>
     );
 }

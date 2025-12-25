@@ -22,6 +22,20 @@ exports.registerUser = async (req, res) => {
       password: hashedPassword,
     });
 
+    // CREATE NOTIFICATION (Non-blocking)
+    try {
+      const Notification = require("../models/Notification");
+      await Notification.create({
+        type: "USER_REGISTERED",
+        message: `New User Registered: ${user.name} (${user.email})`,
+        meta: {
+          userId: user._id
+        }
+      });
+    } catch (notifError) {
+      console.error("[Register] Notification creation failed:", notifError.message);
+    }
+
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -140,6 +154,22 @@ exports.addToCart = async (req, res) => {
     }
 
     await user.save();
+
+    // CREATE NOTIFICATION (Non-blocking)
+    try {
+      const Notification = require("../models/Notification");
+      const Product = require("../models/Product");
+      const product = await Product.findById(productId);
+      await Notification.create({
+        type: "CART_ADDED",
+        message: `${user.name} added ${product?.title || "a product"} to cart`,
+        meta: {
+          userId: user._id
+        }
+      });
+    } catch (notifError) {
+      console.error("[Cart] Notification creation failed:", notifError.message);
+    }
     const updatedUser = await User.findById(req.user._id).populate("cart.product");
     res.json(updatedUser.cart);
   } catch (error) {

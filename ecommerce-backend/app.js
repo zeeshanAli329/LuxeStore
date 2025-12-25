@@ -6,6 +6,7 @@ require("dotenv").config();
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
 
@@ -37,7 +38,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Safe Preflight Middleware (replaces app.options("*") which causes PathError)
+// Safe Preflight Middleware
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   const isVercel = origin && (origin.endsWith(".vercel.app") || origin.includes("vercel.app"));
@@ -47,7 +48,6 @@ app.use((req, res, next) => {
   if (isAllowed) {
     res.header("Access-Control-Allow-Origin", origin);
   } else {
-    // Fallback but still allow public GETs if needed
     res.header("Access-Control-Allow-Origin", "*");
   }
 
@@ -60,12 +60,14 @@ app.use((req, res, next) => {
   }
   next();
 });
+
 app.use(express.json());
 
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Health Check
 app.get("/api/health", (req, res) => {
