@@ -118,7 +118,7 @@ export default function DetailsPage({ id }) {
                                 </p>
                                 {product.oldPrice && product.oldPrice > product.newPrice && (
                                     <p className="text-xl text-gray-400 line-through">
-                                        Rs.{product.oldPrice.toFixed(2)}
+                                        Rs.{product.oldPrice.toFixed(0)}
                                     </p>
                                 )}
                             </div>
