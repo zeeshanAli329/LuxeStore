@@ -5,7 +5,7 @@ import { createOrder } from "../../services/orderService";
 import { useRouter } from "next/navigation";
 import { formatPKR } from "@/utils/currency";
 
-export default function Checkout() {
+export default function CheckoutClient() {
     const { cart, user } = useStore();
     const router = useRouter();
     const [phone, setPhone] = useState("");
@@ -16,7 +16,6 @@ export default function Checkout() {
     const [error, setError] = useState("");
 
     if (!user) {
-        // Safe redirect
         if (typeof window !== "undefined") router.push("/login?next=/checkout");
         return null;
     }
@@ -33,7 +32,7 @@ export default function Checkout() {
     }
 
     const totalAmount = cart.reduce((total, item) => {
-        if (!item.product) return total; // Skip invalid
+        if (!item.product) return total;
         const price = Number(item.product.newPrice || item.product.price || 0);
         const qty = Number(item.quantity || 1);
         return total + (price * qty);
@@ -45,12 +44,8 @@ export default function Checkout() {
         setError("");
 
         try {
-            // Filter out items with missing product data to prevent crashes
             const validItems = cart.filter(item => item.product && item.product._id);
-
-            if (validItems.length === 0) {
-                throw new Error("Cart contains invalid items. Please clear cart and try again.");
-            }
+            if (validItems.length === 0) throw new Error("Cart contains invalid items.");
 
             const products = validItems.map((item) => ({
                 product: item.product._id,
@@ -61,16 +56,11 @@ export default function Checkout() {
                 unitPrice: Number(item.product.newPrice || item.product.price || 0)
             }));
 
-            if (typeof window !== "undefined" && !localStorage.getItem("token")) {
-                setError("Session expired. Please log in again.");
-                return;
-            }
-
             const res = await createOrder({
                 products,
                 totalAmount,
                 shippingAddress: {
-                    fullName: user.name, // Logged in user name
+                    fullName: user.name,
                     address,
                     city,
                     postalCode: zip,
@@ -79,13 +69,8 @@ export default function Checkout() {
                 },
             });
 
-
-            // Redirect to Thank You page
             router.push(`/thank-you?orderId=${res.data._id}`);
         } catch (err) {
-            console.error(err);
-            console.error(err);
-            // Backend sends { error: "..." } for 500s, { message: "..." } for 400s
             const msg = err.response?.data?.error || err.response?.data?.message || err.message || "Failed to place order";
             setError(msg);
             setLoading(false);
@@ -165,7 +150,6 @@ export default function Checkout() {
 
                         {error && <div className="p-4 bg-red-50 text-red-600 rounded-lg text-sm">{error}</div>}
 
-                        {/* Payment Method - COD Enforced */}
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                             <h2 className="text-lg font-semibold text-gray-900 mb-4">Payment Method</h2>
                             <div className="flex items-center space-x-3 p-4 border border-blue-600 bg-blue-50 rounded-lg cursor-pointer">

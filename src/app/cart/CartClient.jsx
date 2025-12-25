@@ -2,18 +2,17 @@
 import { useStore } from "@/store";
 import { useRouter } from "next/navigation";
 
-export default function CartPage() {
+export default function CartClient() {
     const { cart, removeFromCart, user } = useStore();
     const router = useRouter();
 
     if (!user) {
-        // Optionally render a message or redirect
         return (
             <div className="min-h-screen flex items-center justify-center flex-col gap-4">
                 <p className="text-lg font-medium">Please login to view your cart</p>
                 <button
                     onClick={() => router.push("/login")}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
                 >
                     Login
                 </button>
@@ -44,21 +43,19 @@ export default function CartPage() {
                 <div className="space-y-4">
                     {cart.map((item) => {
                         const product = item.product;
-                        if (!product) return null; // Skip invalid items
+                        if (!product) return null;
 
                         return (
                             <div
                                 key={product._id}
                                 className="flex items-center gap-6 border-b py-4 last:border-0"
                             >
-                                {/* Image */}
                                 <img
                                     src={product.image || "/placeholder.png"}
                                     alt={product.title}
                                     className="w-20 h-20 object-contain rounded-md border border-gray-100"
                                 />
 
-                                {/* Info */}
                                 <div className="flex-1">
                                     <h2 className="font-semibold text-gray-900">{product.title}</h2>
                                     <p className="text-gray-500 text-sm">Category: {product.category}</p>
@@ -70,14 +67,11 @@ export default function CartPage() {
                                     <p className="font-medium text-blue-600 mt-1">${product.newPrice?.toFixed(2) || product.price?.toFixed(2)}</p>
                                 </div>
 
-
-                                {/* Quantity */}
                                 <div className="flex items-center gap-3">
                                     <span className="text-sm text-gray-500">Qty:</span>
                                     <span className="font-medium">{item.quantity}</span>
                                 </div>
 
-                                {/* Actions */}
                                 <button
                                     onClick={() => removeFromCart(product._id)}
                                     className="p-2 text-red-500 hover:bg-red-50 cursor-pointer rounded-full transition-colors"
@@ -96,7 +90,6 @@ export default function CartPage() {
                     })}
                 </div>
 
-                {/* Footer Total */}
                 <div className="mt-8 flex justify-end items-center border-t pt-6 gap-6">
                     <div className="text-xl font-bold text-gray-900">
                         Total: <span className="text-blue-600">${calculateTotal()}</span>

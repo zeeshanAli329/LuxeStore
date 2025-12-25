@@ -1,5 +1,10 @@
 import Link from "next/link";
 
+export const metadata = {
+    title: "Browse Categories",
+    description: "Explore our wide range of premium collections across fashion, electronics, jewelry and more.",
+};
+
 const categories = [
     {
         id: 1,
