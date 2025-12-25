@@ -114,7 +114,7 @@ export default function DetailsPage({ id }) {
 
                             <div className="flex items-center gap-4 mb-6">
                                 <p className="text-4xl font-bold text-gray-900">
-                                    Rs.{product.newPrice?.toFixed(2) || product.price?.toFixed(2)}
+                                    Rs.{product.newPrice?.toFixed(2) || product.price?.toFixed(0)}
                                 </p>
                                 {product.oldPrice && product.oldPrice > product.newPrice && (
                                     <p className="text-xl text-gray-400 line-through">
