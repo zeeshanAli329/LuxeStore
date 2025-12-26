@@ -7,6 +7,8 @@ const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const boutiqueRoutes = require("./routes/boutiqueRoutes");
+
 
 const app = express();
 
@@ -62,12 +64,16 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
 // Routes
+
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/boutique", boutiqueRoutes);
+
 
 // Health Check
 app.get("/api/health", (req, res) => {

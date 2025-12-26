@@ -57,7 +57,9 @@ export default function AdminLayoutClient({ children }) {
                     <NavLink href="/admin" label="Dashboard" />
                     <NavLink href="/admin/products" label="Products" />
                     <NavLink href="/admin/orders" label="Orders" />
+                    <NavLink href="/admin/boutique-bookings" label="Boutique Bookings" />
                     <NavLink href="/admin/users" label="Users" />
+
                     <NavLink href="/admin/settings" label="Settings" />
 
                     <div className="pt-4 mt-4 border-t border-gray-100">

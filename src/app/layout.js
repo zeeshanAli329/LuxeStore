@@ -82,6 +82,8 @@ export const metadata = {
   },
 };
 
+import WhatsAppButton from "@/components/WhatsAppButton";
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -91,9 +93,11 @@ export default function RootLayout({ children }) {
         <StoreProvider>
           <ClientLayout>
             {children}
+            <WhatsAppButton />
           </ClientLayout>
         </StoreProvider>
       </body>
     </html>
   );
 }
+

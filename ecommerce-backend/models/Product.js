@@ -32,9 +32,9 @@ const productSchema = new mongoose.Schema(
         },
         stock: {
             type: Number,
-            required: true,
             default: 0,
         },
+
         isFeatured: {
             type: Boolean,
             default: false,
@@ -49,6 +49,22 @@ const productSchema = new mongoose.Schema(
         },
         colors: [String], // Array of available colors
         sizes: [String],  // Array of available sizes (String to handle "42", "XL", etc.)
+        isBoutique: {
+            type: Boolean,
+            default: false,
+        },
+        designTimeMinDays: {
+            type: Number,
+        },
+        designTimeMaxDays: {
+            type: Number,
+        },
+        visitLocationText: {
+            type: String,
+        },
+        visitLocationMapUrl: {
+            type: String,
+        },
     },
     { timestamps: true }
 );

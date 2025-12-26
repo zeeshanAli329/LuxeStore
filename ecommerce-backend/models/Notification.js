@@ -4,9 +4,10 @@ const notificationSchema = new mongoose.Schema(
     {
         type: {
             type: String,
-            enum: ["ORDER_PLACED", "USER_REGISTERED", "CART_ADDED"],
+            enum: ["ORDER_PLACED", "USER_REGISTERED", "CART_ADDED", "BOUTIQUE_BOOKED"],
             required: true,
         },
+
         message: {
             type: String,
             required: true,
