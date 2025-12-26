@@ -46,7 +46,7 @@ exports.getProductById = async (req, res) => {
 // CREATE PRODUCT (ADMIN)
 exports.createProduct = async (req, res) => {
     try {
-        const { title, description, image, images, video, oldPrice, newPrice, discount, category, stock, isFeatured, colors, sizes } = req.body;
+        const { title, description, image, images, video, oldPrice, newPrice, discount, category, stock, isFeatured, colors, sizes, isBoutique, designTimeMinDays, designTimeMaxDays, visitLocationText, visitLocationMapUrl } = req.body;
 
         // Calculate discount if not provided but old/new prices are
         let finalDiscount = discount;
@@ -67,7 +67,12 @@ exports.createProduct = async (req, res) => {
             stock,
             isFeatured,
             colors: colors || [],
-            sizes: sizes || []
+            sizes: sizes || [],
+            isBoutique: isBoutique || false,
+            designTimeMinDays,
+            designTimeMaxDays,
+            visitLocationText,
+            visitLocationMapUrl
         });
 
         res.status(201).json(product);
@@ -94,9 +99,14 @@ exports.updateProduct = async (req, res) => {
         product.category = req.body.category || product.category;
         product.stock = req.body.stock || product.stock;
         product.isFeatured = req.body.isFeatured !== undefined ? req.body.isFeatured : product.isFeatured;
+        product.isBoutique = req.body.isBoutique !== undefined ? req.body.isBoutique : product.isBoutique;
         product.colors = req.body.colors || product.colors;
         product.sizes = req.body.sizes || product.sizes;
         product.video = req.body.video !== undefined ? req.body.video.trim() : product.video;
+        product.designTimeMinDays = req.body.designTimeMinDays !== undefined ? req.body.designTimeMinDays : product.designTimeMinDays;
+        product.designTimeMaxDays = req.body.designTimeMaxDays !== undefined ? req.body.designTimeMaxDays : product.designTimeMaxDays;
+        product.visitLocationText = req.body.visitLocationText !== undefined ? req.body.visitLocationText : product.visitLocationText;
+        product.visitLocationMapUrl = req.body.visitLocationMapUrl !== undefined ? req.body.visitLocationMapUrl : product.visitLocationMapUrl;
 
         if (req.body.images !== undefined) {
             product.images = Array.isArray(req.body.images) ? req.body.images.filter(img => img.trim() !== "") : [];

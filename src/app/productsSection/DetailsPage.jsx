@@ -167,22 +167,40 @@ export default function DetailsPage({ id }) {
                                     </div>
 
                                     {product.visitLocationText && (
-                                        <div className="flex items-center gap-2">
-                                            <div className="p-1.5 bg-blue-100 rounded-md">
-                                                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                </svg>
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex items-center gap-2">
+                                                <div className="p-1.5 bg-blue-100 rounded-md shrink-0">
+                                                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[10px] text-blue-600 font-bold uppercase tracking-wider leading-none">Visit Location</p>
+                                                    <p className="text-xs font-medium text-gray-900 mt-0.5">{product.visitLocationText}</p>
+                                                    {product.visitLocationMapUrl && (
+                                                        <a href={product.visitLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-700 font-bold underline hover:text-blue-800 transition-colors mt-0.5 inline-block">
+                                                            Open in Google Maps
+                                                        </a>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="text-[10px] text-blue-600 font-bold uppercase tracking-wider leading-none">Visit Location</p>
-                                                <p className="text-xs font-medium text-gray-900">{product.visitLocationText}</p>
-                                                {product.visitLocationMapUrl && (
-                                                    <a href={product.visitLocationMapUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-700 font-bold underline hover:text-blue-800 transition-colors mt-0.5 inline-block">
-                                                        Open in Google Maps
-                                                    </a>
-                                                )}
-                                            </div>
+
+                                            {/* Google Maps Embed - Only if URL supports embedding */}
+                                            {product.visitLocationMapUrl && product.visitLocationMapUrl.includes("google.com/maps/embed") && (
+                                                <div className="w-full h-[240px] lg:h-[320px] rounded-xl overflow-hidden border border-gray-200 shadow-sm mt-1">
+                                                    <iframe
+                                                        src={product.visitLocationMapUrl}
+                                                        width="100%"
+                                                        height="100%"
+                                                        style={{ border: 0 }}
+                                                        allowFullScreen=""
+                                                        loading="lazy"
+                                                        referrerPolicy="no-referrer-when-downgrade"
+                                                        title="Boutique Location"
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -242,12 +260,44 @@ export default function DetailsPage({ id }) {
 
                             <div className="flex gap-3 flex-col sm:flex-row">
                                 {(product.category === "Boutique" || product.isBoutique) ? (
-                                    <button
-                                        onClick={() => setIsBookingModalOpen(true)}
-                                        className="flex-1 px-6 py-3 cursor-pointer rounded-lg font-bold text-base transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg bg-blue-600 text-white hover:bg-blue-700"
-                                    >
-                                        Book this Design
-                                    </button>
+                                    (() => {
+                                        const hasLocation = Boolean(
+                                            (product.visitLocationText && product.visitLocationText.trim()) ||
+                                            (product.visitLocationMapUrl && product.visitLocationMapUrl.trim())
+                                        );
+
+                                        if (hasLocation) {
+                                            return (
+                                                <div className="flex gap-2 flex-1">
+                                                    <button
+                                                        onClick={() => setIsBookingModalOpen(true)}
+                                                        className="flex-1 px-4 py-3 cursor-pointer rounded-lg font-bold text-sm lg:text-base transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg bg-blue-600 text-white hover:bg-blue-700"
+                                                    >
+                                                        Book Now
+                                                    </button>
+                                                    {product.visitLocationMapUrl && (
+                                                        <a
+                                                            href={product.visitLocationMapUrl}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="flex-1 flex items-center justify-center px-4 py-3 cursor-pointer rounded-lg font-bold text-sm lg:text-base transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg bg-gray-900 text-white hover:bg-gray-800 text-center"
+                                                        >
+                                                            Visit Place
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            );
+                                        } else {
+                                            return (
+                                                <button
+                                                    onClick={() => setIsBookingModalOpen(true)}
+                                                    className="flex-1 px-6 py-3 cursor-pointer rounded-lg font-bold text-base transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg bg-blue-600 text-white hover:bg-blue-700"
+                                                >
+                                                    Book this Design
+                                                </button>
+                                            );
+                                        }
+                                    })()
                                 ) : (
                                     <>
                                         <button
