@@ -72,7 +72,9 @@ export default function HomeClient() {
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                 />
                                 <div className="absolute inset-0 flex items-center justify-center z-20">
-                                    <h3 className="text-white text-xl sm:text-2xl font-bold uppercase tracking-wider shadow-sm text-shadow-md">{cat}</h3>
+                                    <h3 className="text-white text-xl sm:text-2xl font-bold uppercase tracking-wider shadow-sm text-shadow-md">
+                                        {cat === "men's clothing" ? "Men's Wearing" : cat === "women's clothing" ? "Women Wearing" : cat}
+                                    </h3>
                                 </div>
                             </Link>
                         ))}

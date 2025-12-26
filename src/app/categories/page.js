@@ -8,14 +8,14 @@ export const metadata = {
 const categories = [
     {
         id: 1,
-        name: 'Women\'s Fashion',
+        name: 'Women Wearing',
         image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
         href: '/shop?category=women',
         count: '120+ Items'
     },
     {
         id: 2,
-        name: 'Men\'s Collection',
+        name: 'Men\'s Wearing',
         image: 'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
         href: '/shop?category=men',
         count: '85+ Items'

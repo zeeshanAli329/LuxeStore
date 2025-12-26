@@ -275,8 +275,8 @@ export default function EditProductPage({ params }) {
                         >
                             <option value="electronics">Electronics</option>
                             <option value="jewelry">Jewelry</option>
-                            <option value="men's clothing">Men's Clothing</option>
-                            <option value="women's clothing">Women's Clothing</option>
+                            <option value="men's clothing">Men's Wearing</option>
+                            <option value="women's clothing">Women Wearing</option>
                             <option value="others">Others</option>
                         </select>
                     </div>
