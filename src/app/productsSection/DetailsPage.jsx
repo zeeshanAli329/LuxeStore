@@ -131,14 +131,14 @@ export default function DetailsPage({ id }) {
                                 {product.title}
                             </h1>
 
-                            <div className="flex items-center gap-2 mb-3">
-                                <p className="text-xl font-bold text-gray-900">
-                                    Rs.{product.newPrice?.toFixed(0)}
+                            <div className="flex items-center gap-6 mb-3">
+                                <p className="text-xl font-bold text-blue-500">
+                                    Rs.  {product.newPrice?.toFixed(0)}
                                 </p>
 
                                 {product.oldPrice && product.oldPrice > product.newPrice && (
-                                    <p className="text-sm text-gray-400 line-through">
-                                        Rs.{product.oldPrice.toFixed(0)}
+                                    <p className="text-sm text-red-400 line-through">
+                                        Rs. {product.oldPrice.toFixed(0)}
                                     </p>
                                 )}
                             </div>

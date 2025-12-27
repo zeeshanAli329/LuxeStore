@@ -40,13 +40,13 @@ export default function ProductGallery({ mainImage, additionalImages = [], title
         <div className="flex flex-col gap-3">
             {/* Main Image Area */}
             <div
-                className="relative h-[45vh] lg:h-[60vh] bg-white rounded-[20px] overflow-hidden border border-gray-100 flex items-center justify-center group shadow-sm cursor-pointer w-full"
+                className="relative h-[45vh] lg:h-[60vh] bg-white rounded-[20px] overflow-hidden border border-gray-100 flex items-center justify-center group shadow-sm cursor-pointer w-[80%]"
                 onClick={() => setIsFullscreenOpen(true)}
             >
                 <img
                     src={selectedImage || "/placeholder.png"}
                     alt={`${title} - view ${selectedIndex + 1}`}
-                    className="w-full h-full object-contain transition-all duration-500 group-hover:scale-105"
+                    className="w-full h-full object-contain transition-all duration-500 group-hover:scale-105 "
                 />
             </div>
 
