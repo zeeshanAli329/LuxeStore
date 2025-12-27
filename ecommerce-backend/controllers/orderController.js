@@ -89,6 +89,7 @@ exports.createOrder = async (req, res) => {
             const Notification = require("../models/Notification");
             await Notification.create({
                 type: "ORDER_PLACED",
+                audience: "admin",
                 message: `New Order #${order._id.toString().slice(-6)} placed by ${order.shippingAddress.fullName}`,
                 meta: {
                     orderId: order._id,
@@ -182,6 +183,23 @@ exports.updateOrderStatus = async (req, res) => {
         await order.save({ validateBeforeSave: false });
 
         res.json(order);
+
+        // Notify User
+        try {
+            const Notification = require("../models/Notification");
+            await Notification.create({
+                type: "ORDER_STATUS_UPDATED",
+                audience: "user",
+                userId: order.user,
+                message: `Your Order #${order._id.toString().slice(-6)} is now ${status}`,
+                meta: {
+                    orderId: order._id,
+                    userId: order.user
+                }
+            });
+        } catch (notifErr) {
+            console.error("Failed to create status notification:", notifErr);
+        }
     } catch (error) {
         console.error("Update Order Status Error:", error);
         res.status(500).json({ message: error.message });

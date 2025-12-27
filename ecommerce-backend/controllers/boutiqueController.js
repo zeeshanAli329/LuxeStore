@@ -42,9 +42,12 @@ exports.createBooking = async (req, res) => {
         // Create Admin Notification
         await Notification.create({
             type: "BOUTIQUE_BOOKED",
+            audience: "admin",
             message: `New boutique booking received for ${productName} from ${customerName}`,
             meta: {
-                userId: req.user ? req.user._id : null
+                userId: req.user ? req.user._id : null,
+                bookingId: savedBooking._id,
+                productId: productId
             }
         });
 
@@ -73,6 +76,13 @@ exports.getBookings = async (req, res) => {
 exports.updateBookingStatus = async (req, res) => {
     try {
         const { status } = req.body;
+
+        // Validate Status
+        const allowedStatuses = ["New", "Contacted", "Confirmed", "Delivered", "Cancelled", "Advance Paid"];
+        if (!allowedStatuses.includes(status)) {
+            return res.status(400).json({ message: "Invalid status value" });
+        }
+
         const booking = await BoutiqueBooking.findById(req.params.id);
 
         if (!booking) {
@@ -80,9 +90,10 @@ exports.updateBookingStatus = async (req, res) => {
         }
 
         booking.status = status;
-        const updatedBooking = await booking.save();
+        const updatedBooking = await booking.save({ validateBeforeSave: false });
         res.status(200).json(updatedBooking);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error("Boutique Status Update Error:", error);
+        res.status(500).json({ message: error.message || "Failed to update status" });
     }
 };

@@ -1,3 +1,7 @@
+
+
+
+
 const express = require("express");
 const {
     getNotifications,
@@ -9,12 +13,18 @@ const { protect, admin } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// All notification routes are admin-only
-router.use(protect, admin);
+// Admin Routes
+router.get("/admin", protect, admin, getNotifications);
+router.get("/admin/count", protect, admin, getUnreadCount);
+router.patch("/admin/mark-all-read", protect, admin, markAllRead);
 
-router.get("/", getNotifications);
-router.get("/count", getUnreadCount);
-router.patch("/mark-all-read", markAllRead);
-router.patch("/:id/read", markAsRead);
+// User Routes (Me)
+router.get("/me", protect, getNotifications);
+router.get("/me/count", protect, getUnreadCount);
+router.patch("/me/mark-all-read", protect, markAllRead);
+
+
+// Mark single read (shared)
+router.patch("/:id/read", protect, markAsRead);
 
 module.exports = router;

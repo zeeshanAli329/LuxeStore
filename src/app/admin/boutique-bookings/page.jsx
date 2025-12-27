@@ -30,7 +30,7 @@ export default function BoutiqueBookingsPage() {
             setBookings(bookings.map(b => b._id === id ? { ...b, status: newStatus } : b));
         } catch (error) {
             console.error("Failed to update status", error);
-            alert("Failed to update status");
+            alert(error.response?.data?.message || "Failed to update status");
         }
     };
 

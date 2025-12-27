@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 
-export default function AdminNotifications() {
+export default function UserNotifications() {
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
@@ -17,7 +17,7 @@ export default function AdminNotifications() {
     useEffect(() => {
         if (typeof window !== "undefined") {
             audioRef.current = new Audio("/sounds/notify.mp3");
-            const savedSound = localStorage.getItem("adminSoundEnabled");
+            const savedSound = localStorage.getItem("userSoundEnabled");
             if (savedSound === "true") setSoundEnabled(true);
         }
     }, []);
@@ -25,39 +25,35 @@ export default function AdminNotifications() {
     const toggleSound = () => {
         const newState = !soundEnabled;
         setSoundEnabled(newState);
-        localStorage.setItem("adminSoundEnabled", newState);
+        localStorage.setItem("userSoundEnabled", newState);
     };
 
     const fetchNotifications = async () => {
         try {
             const [listRes, countRes] = await Promise.all([
-                api.get("/notifications/admin?since=" + (new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())), // Fetch last 24h or simple list
-                api.get("/notifications/admin/count")
+                api.get("/notifications/me?since=" + (new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())), // Last 7 days
+                api.get("/notifications/me/count")
             ]);
 
             setNotifications(listRes.data);
             const newCount = countRes.data.count;
 
-            // Play sound if new unread items arrived
             if (newCount > lastCountRef.current && soundEnabled) {
-                // User interaction check is implicit if they enabled sound via toggle (which requires click)
-                // But browser might block if no interaction in this session.
-                // We assume 'soundEnabled' implies user wants it.
                 audioRef.current?.play().catch(err => console.log("Audio play blocked:", err));
             }
 
             setUnreadCount(newCount);
             lastCountRef.current = newCount;
         } catch (error) {
-            console.error("Failed to fetch notifications", error);
+            console.error("Failed to fetch user notifications", error);
         }
     };
 
     useEffect(() => {
         fetchNotifications();
-        const interval = setInterval(fetchNotifications, 10000); // Poll every 10s
+        const interval = setInterval(fetchNotifications, 15000); // Poll every 15s
         return () => clearInterval(interval);
-    }, [soundEnabled]); // Re-bind if needed, or just access ref
+    }, [soundEnabled]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -71,7 +67,7 @@ export default function AdminNotifications() {
 
     const handleMarkAllRead = async () => {
         try {
-            await api.patch("/notifications/admin/mark-all-read");
+            await api.patch("/notifications/me/mark-all-read");
             setUnreadCount(0);
             setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
             lastCountRef.current = 0;
@@ -93,12 +89,8 @@ export default function AdminNotifications() {
         }
 
         setIsOpen(false);
-        if (notification.type === "ORDER_PLACED") {
-            router.push("/admin/orders");
-        } else if (notification.type === "BOUTIQUE_BOOKED") {
-            router.push("/admin/boutique-bookings");
-        } else if (notification.type === "USER_REGISTERED") {
-            router.push("/admin/users");
+        if (notification.type === "ORDER_STATUS_UPDATED" || notification.type === "ORDER_PLACED") {
+            router.push("/profile");
         }
     };
 
@@ -115,68 +107,66 @@ export default function AdminNotifications() {
 
     return (
         <div className="relative" ref={dropdownRef}>
-            {/* Bell Icon */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-2 cursor-pointer text-blue-400 hover:text-blue-600 focus:outline-none relative transition-colors"
+                className="p-1 text-gray-500 hover:text-blue-600 focus:outline-none relative transition-colors transform hover:scale-110 cursor-pointer"
                 aria-label="Notifications"
             >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
                 {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full border-2 border-white">
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/3 -translate-y-1/3 bg-red-600 rounded-full border border-white">
                         {unreadCount > 9 ? "9+" : unreadCount}
                     </span>
                 )}
             </button>
 
-            {/* Dropdown Panel */}
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden transform origin-top-right transition-all">
-                    <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <div className="absolute right-0 mt-3 w-72 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden transform origin-top-right transition-all">
+                    <div className="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                         <div className="flex items-center gap-2">
-                            <h3 className="font-bold text-gray-900">Notifications</h3>
+                            <h3 className="font-bold text-gray-900 text-sm">Notifications</h3>
                             <button
                                 onClick={toggleSound}
                                 className={`p-1 rounded-full transition-colors ${soundEnabled ? 'text-blue-600 hover:bg-blue-100' : 'text-gray-400 hover:bg-gray-200'}`}
                                 title={soundEnabled ? "Sound On" : "Sound Off"}
                             >
                                 {soundEnabled ? (
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
                                 ) : (
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
                                 )}
                             </button>
                         </div>
                         {unreadCount > 0 && (
                             <button
                                 onClick={handleMarkAllRead}
-                                className="text-xs cursor-pointer text-blue-600 hover:text-blue-800 font-medium"
+                                className="text-[10px] cursor-pointer text-blue-600 hover:text-blue-800 font-medium"
                             >
                                 Mark all read
                             </button>
                         )}
                     </div>
 
-                    <div className="max-h-[400px] overflow-y-auto">
+                    <div className="max-h-[300px] overflow-y-auto">
                         {notifications.length === 0 ? (
-                            <div className="p-8 text-center text-gray-400 text-sm">
-                                No notifications yet
+                            <div className="p-6 text-center text-gray-400 text-xs">
+                                No notifications
                             </div>
                         ) : (
                             notifications.map((notif) => (
                                 <div
                                     key={notif._id}
                                     onClick={() => handleNotificationClick(notif)}
-                                    className={`p-4 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition-colors flex gap-3 ${!notif.isRead ? "bg-blue-50/30" : ""}`}
+                                    className={`p-3 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition-colors flex gap-2 ${!notif.isRead ? "bg-blue-50/40" : ""}`}
                                 >
-                                    <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${!notif.isRead ? "bg-blue-600" : "bg-transparent"}`} />
+                                    <div className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${!notif.isRead ? "bg-blue-600" : "bg-transparent"}`} />
                                     <div className="flex-1">
-                                        <p className={`text-sm ${!notif.isRead ? "text-gray-900 font-semibold" : "text-gray-600"}`}>
+                                        <p className={`text-xs ${!notif.isRead ? "text-gray-900 font-semibold" : "text-gray-600"}`}>
                                             {notif.message}
                                         </p>
-                                        <p className="text-xs text-gray-400 mt-1 uppercase tracking-tighter">
+                                        <p className="text-[10px] text-gray-400 mt-0.5">
                                             {formatTime(notif.createdAt)}
                                         </p>
                                     </div>
@@ -184,12 +174,6 @@ export default function AdminNotifications() {
                             ))
                         )}
                     </div>
-
-                    {notifications.length > 0 && (
-                        <div className="p-2 border-t border-gray-100 text-center bg-gray-50/30">
-                            <span className="text-[10px] text-gray-400 font-medium italic">Latest activities</span>
-                        </div>
-                    )}
                 </div>
             )}
         </div>
