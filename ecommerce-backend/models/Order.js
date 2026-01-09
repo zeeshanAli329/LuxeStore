@@ -18,6 +18,7 @@ const orderSchema = new mongoose.Schema(
                     type: mongoose.Schema.Types.ObjectId,
                     ref: "Product",
                 },
+                name: String, // Snapshot of product name
                 quantity: {
                     type: Number,
                     required: true,

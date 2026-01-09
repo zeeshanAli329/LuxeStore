@@ -32,8 +32,10 @@ exports.createOrder = async (req, res) => {
             return res.status(400).json({ message: "Complete shipping address and phone are required" });
         }
 
-        // Stock Check & Variant Validation
+        // Stock Check & Variant Validation & Build Final Items
         const Product = require("../models/Product");
+        const finalOrderItems = [];
+
         for (const item of products) {
             const product = await Product.findById(item.product);
             if (!product) {
@@ -52,20 +54,24 @@ exports.createOrder = async (req, res) => {
             if (product.colors && product.colors.length > 0 && !item.selectedColor) {
                 return res.status(400).json({ message: `Please select a color for ${product.title}` });
             }
+
+            // Add to final items list with snapshot name
+            finalOrderItems.push({
+                product: item.product,
+                quantity: item.quantity,
+                selectedColor: item.selectedColor,
+                selectedSize: item.selectedSize,
+                image: item.image,
+                unitPrice: item.unitPrice,
+                name: product.title // Snapshot of product name
+            });
         }
 
         // Create the Order
         const order = await Order.create({
             user: req.user ? req.user._id : undefined,
             guestInfo: req.user ? undefined : guestInfo,
-            products: products.map(item => ({
-                product: item.product,
-                quantity: item.quantity,
-                selectedColor: item.selectedColor,
-                selectedSize: item.selectedSize,
-                image: item.image,
-                unitPrice: item.unitPrice
-            })),
+            products: finalOrderItems,
             totalAmount,
             shippingAddress,
             paymentMethod: "COD",

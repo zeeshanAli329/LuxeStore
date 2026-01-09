@@ -96,7 +96,7 @@ export default function AdminOrdersPage() {
                                         <div className="space-y-1">
                                             {order.products?.map((item, i) => (
                                                 <div key={i} className="text-[10px] leading-tight text-gray-600 bg-gray-50 p-1 rounded border border-gray-100">
-                                                    <span className="font-bold">{item.quantity}x</span> {item.product?.title || "Product"}
+                                                    <span className="font-bold">{item.quantity}x</span> {item.name || "(Unnamed Product)"}
                                                     {(item.selectedColor || item.selectedSize) && (
                                                         <span className="text-blue-600 font-medium ml-1">
                                                             ({item.selectedColor || '-'}, {item.selectedSize || '-'})
