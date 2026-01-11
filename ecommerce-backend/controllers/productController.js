@@ -1,7 +1,7 @@
 const Product = require("../models/Product");
 
 // GET ALL PRODUCTS
-exports.getProducts = async (req, res) => {
+const getProducts = async (req, res) => {
     try {
         // Simple search & filter
         const { keyword, category, featured, limit } = req.query;
@@ -31,7 +31,7 @@ exports.getProducts = async (req, res) => {
 };
 
 // GET SINGLE PRODUCT
-exports.getProductById = async (req, res) => {
+const getProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) {
@@ -44,9 +44,9 @@ exports.getProductById = async (req, res) => {
 };
 
 // CREATE PRODUCT (ADMIN)
-exports.createProduct = async (req, res) => {
+const createProduct = async (req, res) => {
     try {
-        const { title, description, image, images, video, oldPrice, newPrice, discount, category, stock, isFeatured, colors, sizes, isBoutique, designTimeMinDays, designTimeMaxDays, visitLocationText, visitLocationMapUrl } = req.body;
+        const { title, description, image, images, video, oldPrice, newPrice, discount, category, stock, isFeatured, colors, sizes, isBoutique, designTimeMinDays, designTimeMaxDays, visitLocationText, visitLocationMapUrl, isOnSale, saleLabel, saleEndsAt, isDeal, dealLabel, dealEndsAt, dealNote } = req.body;
 
         // Calculate discount if not provided but old/new prices are
         let finalDiscount = discount;
@@ -72,7 +72,14 @@ exports.createProduct = async (req, res) => {
             designTimeMinDays,
             designTimeMaxDays,
             visitLocationText,
-            visitLocationMapUrl
+            visitLocationMapUrl,
+            isOnSale: isOnSale || false,
+            saleLabel: saleLabel || "",
+            saleEndsAt: saleEndsAt || null,
+            isDeal: isDeal || false,
+            dealLabel: dealLabel || "",
+            dealEndsAt: dealEndsAt || null,
+            dealNote: dealNote || ""
         });
 
         res.status(201).json(product);
@@ -82,54 +89,89 @@ exports.createProduct = async (req, res) => {
 };
 
 // UPDATE PRODUCT (ADMIN)
-exports.updateProduct = async (req, res) => {
+// UPDATE PRODUCT (ADMIN)
+const updateProduct = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
-        if (!product) {
+        const { id } = req.params;
+        console.log(`[UpdateProduct] Request for ID: ${id}`);
+        console.log(`[UpdateProduct] Payload keys:`, Object.keys(req.body));
+
+        // 1. Validate ID
+        // Note: mongoose.Types.ObjectId.isValid might be needed if not handled globally, 
+        // but try/catch usually catches CastError.
+
+        // 2. Find product first to ensure it exists
+        const existingProduct = await Product.findById(id);
+        if (!existingProduct) {
+            console.log(`[UpdateProduct] Product not found: ${id}`);
             return res.status(404).json({ message: "Product not found" });
         }
 
-        product.title = req.body.title || product.title;
-        product.description = req.body.description || product.description;
-        product.image = req.body.image || product.image;
-        product.images = req.body.images || product.images; // Array replacement
-        product.oldPrice = req.body.oldPrice || product.oldPrice;
-        product.newPrice = req.body.newPrice || product.newPrice;
-        product.discount = req.body.discount || product.discount;
-        product.category = req.body.category || product.category;
-        product.stock = req.body.stock || product.stock;
-        product.isFeatured = req.body.isFeatured !== undefined ? req.body.isFeatured : product.isFeatured;
-        product.isBoutique = req.body.isBoutique !== undefined ? req.body.isBoutique : product.isBoutique;
-        product.colors = req.body.colors || product.colors;
-        product.sizes = req.body.sizes || product.sizes;
-        product.video = req.body.video !== undefined ? req.body.video.trim() : product.video;
-        product.designTimeMinDays = req.body.designTimeMinDays !== undefined ? req.body.designTimeMinDays : product.designTimeMinDays;
-        product.designTimeMaxDays = req.body.designTimeMaxDays !== undefined ? req.body.designTimeMaxDays : product.designTimeMaxDays;
-        product.visitLocationText = req.body.visitLocationText !== undefined ? req.body.visitLocationText : product.visitLocationText;
-        product.visitLocationMapUrl = req.body.visitLocationMapUrl !== undefined ? req.body.visitLocationMapUrl : product.visitLocationMapUrl;
+        // 3. Build updates object safely
+        // Only include keys that are explicitly in provided body to avoiding overwriting with undefined
+        const updates = {};
+        const allowedFields = [
+            'title', 'description', 'image', 'images', 'video',
+            'oldPrice', 'newPrice', 'discount', 'category', 'stock',
+            'isFeatured', 'isBoutique', 'colors', 'sizes',
+            'designTimeMinDays', 'designTimeMaxDays',
+            'visitLocationText', 'visitLocationMapUrl',
+            'isOnSale', 'saleLabel', 'saleEndsAt',
+            'isDeal', 'dealLabel', 'dealEndsAt', 'dealNote'
+        ];
 
-        if (req.body.images !== undefined) {
-            product.images = Array.isArray(req.body.images) ? req.body.images.filter(img => img.trim() !== "") : [];
-        }
+        allowedFields.forEach((field) => {
+            if (req.body[field] !== undefined) {
+                // Special handling for numbers
+                if (['oldPrice', 'newPrice', 'discount', 'stock', 'designTimeMinDays', 'designTimeMaxDays'].includes(field)) {
+                    updates[field] = req.body[field] === "" ? null : Number(req.body[field]);
+                }
+                // Special handling for Arrays
+                else if (['images', 'colors', 'sizes'].includes(field)) {
+                    // Expecting arrays from frontend now, or ensure they are processed
+                    updates[field] = req.body[field];
+                }
+                // Special handling for dates (empty string -> null)
+                else if (['saleEndsAt', 'dealEndsAt'].includes(field)) {
+                    updates[field] = req.body[field] ? req.body[field] : null;
+                }
+                else {
+                    updates[field] = req.body[field];
+                }
+            }
+        });
 
-        // Recalculate discount if prices changed
-        if (req.body.oldPrice || req.body.newPrice) {
-            const oPrice = product.oldPrice;
-            const nPrice = product.newPrice;
+        // Auto-calculate discount if prices are updated or prices exist in DB
+        const oPrice = updates.oldPrice !== undefined ? updates.oldPrice : existingProduct.oldPrice;
+        const nPrice = updates.newPrice !== undefined ? updates.newPrice : existingProduct.newPrice;
+
+        // If discount is NOT manually provided in this update, calculate it
+        if (updates.discount === undefined || updates.discount === null) {
             if (oPrice && nPrice) {
-                product.discount = Math.round(((oPrice - nPrice) / oPrice) * 100);
+                updates.discount = Math.round(((oPrice - nPrice) / oPrice) * 100);
             }
         }
 
-        const updatedProduct = await product.save();
+        console.log(`[UpdateProduct] Final updates object:`, JSON.stringify(updates, null, 2));
+
+        const updatedProduct = await Product.findByIdAndUpdate(id, updates, {
+            new: true,
+            runValidators: true,
+        });
+
         res.json(updatedProduct);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(`[UpdateProduct] Error:`, error);
+        // Return specific validation message if available
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: error.message });
+        }
+        res.status(500).json({ message: error.message || "Server Error during product update", stack: error.stack });
     }
 };
 
 // DELETE PRODUCT (ADMIN)
-exports.deleteProduct = async (req, res) => {
+const deleteProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) {
@@ -141,4 +183,61 @@ exports.deleteProduct = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
+};
+
+// GET SALE PRODUCTS
+const getSaleProducts = async (req, res) => {
+    try {
+        const now = new Date();
+        const products = await Product.find({
+            isOnSale: true,
+            $or: [
+                { saleEndsAt: { $exists: false } },
+                { saleEndsAt: null },
+                { saleEndsAt: { $gt: now } }
+            ]
+        });
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// GET DEAL PRODUCTS
+const getDealProducts = async (req, res) => {
+    try {
+        const now = new Date();
+        const products = await Product.find({
+            isDeal: true,
+            $or: [
+                { dealEndsAt: { $exists: false } },
+                { dealEndsAt: null },
+                { dealEndsAt: { $gt: now } }
+            ]
+        });
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// GET UNIQUE CATEGORIES
+const getUniqueCategories = async (req, res) => {
+    try {
+        const categories = await Product.distinct("category");
+        res.json(categories);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+module.exports = {
+    getProducts,
+    getProductById,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+    getSaleProducts,
+    getDealProducts,
+    getUniqueCategories
 };

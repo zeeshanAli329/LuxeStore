@@ -39,6 +39,29 @@ const productSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        isOnSale: {
+            type: Boolean,
+            default: false,
+        },
+        saleLabel: {
+            type: String,
+        },
+        saleEndsAt: {
+            type: Date,
+        },
+        isDeal: {
+            type: Boolean,
+            default: false,
+        },
+        dealLabel: {
+            type: String,
+        },
+        dealEndsAt: {
+            type: Date,
+        },
+        dealNote: {
+            type: String,
+        },
         images: {
             type: [String],
             default: []
@@ -64,6 +87,16 @@ const productSchema = new mongoose.Schema(
         },
         visitLocationMapUrl: {
             type: String,
+        },
+        isOnSale: {
+            type: Boolean,
+            default: false,
+        },
+        saleLabel: {
+            type: String,
+        },
+        saleEndsAt: {
+            type: Date,
         },
     },
     { timestamps: true }

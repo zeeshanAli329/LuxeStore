@@ -74,6 +74,10 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/boutique", boutiqueRoutes);
 
+// Categories Route
+const { getUniqueCategories } = require("./controllers/productController");
+app.get("/api/categories", getUniqueCategories);
+
 
 // Health Check
 app.get("/api/health", (req, res) => {

@@ -5,13 +5,28 @@ import Link from "next/link";
 import { COMPANY_NAME, ALT, LOGO } from "@/app/constants/names";
 import { useStore } from "@/store";
 import { useRouter } from "next/navigation";
+import api from "@/lib/api";
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [isCategoriesOpen, setIsCategoriesOpen] = useState(false); // New state for dropdown
+    const [categories, setCategories] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const { cart, user, logout } = useStore();
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await api.get("/categories");
+                setCategories(res.data);
+            } catch (err) {
+                console.error("Failed to fetch categories", err);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const cartCount = cart.reduce((total, item) => total + (item.quantity || 0), 0);
     const router = useRouter();
@@ -53,7 +68,7 @@ export default function Navbar() {
 
                     {/* Tablet Navigation (Visible md-lg) */}
                     <div className="hidden md:flex space-x-6 items-center">
-                        {["Home", "Shop", "Boutique", "Categories", "About", "Contact"].map((item) => (
+                        {["Home", "Sale", "Shop", "Boutique", "Categories", "About", "Contact"].map((item) => (
                             <Link
                                 key={item}
                                 href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
@@ -151,16 +166,54 @@ export default function Navbar() {
 
                     {/* Navigation Links */}
                     <div className="flex space-x-6 items-center">
-                        {["Home", "Shop", "Boutique", "Categories", "About",].map((item) => (
-                            <Link
-                                key={item}
-                                href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                                className="text-gray-700 hover:text-blue-600 font-medium transition-all duration-200 text-sm uppercase tracking-wide relative group py-2"
-                            >
-                                {item}
-                                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
-                            </Link>
-                        ))}
+                        <Link href="/" className="text-gray-700 hover:text-blue-600 font-medium transition-all duration-200 text-sm uppercase tracking-wide relative group py-2">
+                            Home
+                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+                        <Link href="/shop" className="text-gray-700 hover:text-blue-600 font-medium transition-all duration-200 text-sm uppercase tracking-wide relative group py-2">
+                            Shop
+                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+                        <Link href="/boutique" className="text-gray-700 hover:text-blue-600 font-medium transition-all duration-200 text-sm uppercase tracking-wide relative group py-2">
+                            Boutique
+                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
+
+                        {/* Categories Dropdown */}
+                        <div
+                            className="relative group"
+                            onMouseEnter={() => setIsCategoriesOpen(true)}
+                            onMouseLeave={() => setIsCategoriesOpen(false)}
+                        >
+                            <button className="text-gray-700 hover:text-blue-600 font-medium transition-all duration-200 text-sm uppercase tracking-wide py-2 flex items-center gap-1">
+                                Categories
+                                <svg className={`w-4 h-4 transition-transform duration-200 ${isCategoriesOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            {/* Dropdown Menu */}
+                            <div className={`absolute top-full left-0 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 transition-all duration-200 transform origin-top-left z-50 ${isCategoriesOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}>
+                                {categories.length > 0 ? (
+                                    categories.map((cat) => (
+                                        <Link
+                                            key={cat}
+                                            href={`/shop?category=${encodeURIComponent(cat)}`}
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 capitalize transition-colors"
+                                        >
+                                            {cat}
+                                        </Link>
+                                    ))
+                                ) : (
+                                    <span className="block px-4 py-2 text-sm text-gray-400 italic">No categories</span>
+                                )}
+                            </div>
+                        </div>
+
+                        <Link href="/about" className="text-gray-700 hover:text-blue-600 font-medium transition-all duration-200 text-sm uppercase tracking-wide relative group py-2">
+                            About
+                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                        </Link>
                     </div>
 
                     {/* Right Side: Search + Icons */}
@@ -306,17 +359,32 @@ export default function Navbar() {
 
                             {/* Nav Links */}
                             <div className="flex flex-col space-y-2">
-                                {["Home", "Shop", "Boutique", "Categories", "About", "Contact"].map((item) => (
-                                    <Link
-                                        key={item}
-                                        href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
+                                <Link href="/" className="block px-4 py-3 rounded-lg text-lg font-medium text-gray-800 hover:text-blue-600 hover:bg-blue-50 transition-colors border-b border-gray-50" onClick={handleMenuClose}>Home</Link>
+                                <Link href="/sale" className="block px-4 py-3 rounded-lg text-lg font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors border-b border-gray-50" onClick={handleMenuClose}>Sale</Link>
+                                <Link href="/shop" className="block px-4 py-3 rounded-lg text-lg font-medium text-gray-800 hover:text-blue-600 hover:bg-blue-50 transition-colors border-b border-gray-50" onClick={handleMenuClose}>Shop</Link>
+                                <Link href="/boutique" className="block px-4 py-3 rounded-lg text-lg font-medium text-gray-800 hover:text-blue-600 hover:bg-blue-50 transition-colors border-b border-gray-50" onClick={handleMenuClose}>Boutique</Link>
 
-                                        className="block px-4 py-3 rounded-lg text-lg font-medium text-gray-800 hover:text-blue-600 hover:bg-blue-50 transition-colors border-b border-gray-50"
-                                        onClick={handleMenuClose}
-                                    >
-                                        {item}
-                                    </Link>
-                                ))}
+                                {/* Mobile Categories */}
+                                <div className="border-b border-gray-50 pb-2">
+                                    <p className="px-4 py-2 text-sm font-bold text-gray-400 uppercase tracking-wider">Categories</p>
+                                    {categories.length > 0 ? (
+                                        categories.map(cat => (
+                                            <Link
+                                                key={cat}
+                                                href={`/shop?category=${encodeURIComponent(cat)}`}
+                                                className="block px-8 py-2 text-base text-gray-700 hover:text-blue-600 capitalize"
+                                                onClick={handleMenuClose}
+                                            >
+                                                {cat}
+                                            </Link>
+                                        ))
+                                    ) : (
+                                        <span className="block px-8 py-2 text-sm text-gray-400 italic">No categories</span>
+                                    )}
+                                </div>
+
+                                <Link href="/about" className="block px-4 py-3 rounded-lg text-lg font-medium text-gray-800 hover:text-blue-600 hover:bg-blue-50 transition-colors border-b border-gray-50" onClick={handleMenuClose}>About</Link>
+                                <Link href="/contact" className="block px-4 py-3 rounded-lg text-lg font-medium text-gray-800 hover:text-blue-600 hover:bg-blue-50 transition-colors border-b border-gray-50" onClick={handleMenuClose}>Contact</Link>
                             </div>
 
                             {/* Additional Links in Drawer */}

@@ -1,16 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import Link from "next/link";
-import { use } from "react";
 
 export default function EditProductPage({ params }) {
-    // Correctly unwrap params using React.use() or await depending on Next.js version expectations for Client Components.
-    // In Next 15+ params is a Promise. In 14 it was an object. App Router client component handling can vary.
-    // Safe bet: use `use(params)` if on very new React, or just direct access if passed as prop in older.
-    // User is on Next.js 16 (from earlier logs). `params` should be awaited or unwrapped.
-    // However, simplest safe way for now in standard Client Component:
+    // Correctly unwrap params
     const { id } = use(params);
 
     const router = useRouter();
@@ -33,9 +28,41 @@ export default function EditProductPage({ params }) {
         designTimeMinDays: "",
         designTimeMaxDays: "",
         visitLocationText: "",
-        visitLocationMapUrl: ""
+        visitLocationMapUrl: "",
+        isOnSale: false,
+        saleLabel: "",
+        saleEndsAt: "",
+        isDeal: false,
+        dealLabel: "",
+        dealNote: "",
+        dealEndsAt: ""
     });
 
+    const [categories, setCategories] = useState([]);
+    const [isCustomCategory, setIsCustomCategory] = useState(false);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await api.get("/categories");
+                const fetched = res.data;
+                const defaults = ["Women Footwear", "Men Footwear", "Women Clothing", "Men Clothing", "Boutique"];
+                const unique = [...new Set([...defaults, ...fetched])];
+                setCategories(unique);
+            } catch (err) {
+                console.error("Failed to fetch categories", err);
+                setCategories(["Women Footwear", "Men Footwear", "Women Clothing", "Men Clothing", "Boutique"]);
+            }
+        };
+        fetchCategories();
+    }, []);
+
+    // Check if initial category is custom
+    useEffect(() => {
+        if (formData.category && categories.length > 0 && !categories.includes(formData.category)) {
+            setIsCustomCategory(true);
+        }
+    }, [formData.category, categories]);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -59,7 +86,14 @@ export default function EditProductPage({ params }) {
                     designTimeMinDays: p.designTimeMinDays || "",
                     designTimeMaxDays: p.designTimeMaxDays || "",
                     visitLocationText: p.visitLocationText || "",
-                    visitLocationMapUrl: p.visitLocationMapUrl || ""
+                    visitLocationMapUrl: p.visitLocationMapUrl || "",
+                    isOnSale: p.isOnSale || false,
+                    saleLabel: p.saleLabel || "",
+                    saleEndsAt: p.saleEndsAt ? new Date(p.saleEndsAt).toISOString().slice(0, 16) : "",
+                    isDeal: p.isDeal || false,
+                    dealLabel: p.dealLabel || "",
+                    dealNote: p.dealNote || "",
+                    dealEndsAt: p.dealEndsAt ? new Date(p.dealEndsAt).toISOString().slice(0, 16) : ""
                 });
 
             } catch (error) {
@@ -78,10 +112,21 @@ export default function EditProductPage({ params }) {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value
-        }));
+
+        if (name === "categorySelect") {
+            if (value === "__NEW__") {
+                setIsCustomCategory(true);
+                setFormData(prev => ({ ...prev, category: "" }));
+            } else {
+                setIsCustomCategory(false);
+                setFormData(prev => ({ ...prev, category: value }));
+            }
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: type === "checkbox" ? checked : value
+            }));
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -103,14 +148,25 @@ export default function EditProductPage({ params }) {
                 designTimeMaxDays: formData.category === "Boutique" ? Number(formData.designTimeMaxDays) : undefined,
                 visitLocationText: formData.category === "Boutique" ? formData.visitLocationText : undefined,
                 visitLocationMapUrl: formData.category === "Boutique" ? formData.visitLocationMapUrl : undefined,
-                isBoutique: formData.category === "Boutique"
+                isBoutique: formData.category === "Boutique",
+                isOnSale: formData.isOnSale,
+                saleLabel: formData.isOnSale ? formData.saleLabel : undefined,
+                saleEndsAt: formData.isOnSale && formData.saleEndsAt ? formData.saleEndsAt : undefined,
+                isDeal: formData.isDeal,
+                dealLabel: formData.isDeal ? formData.dealLabel : undefined,
+                dealNote: formData.isDeal ? formData.dealNote : undefined,
+                dealEndsAt: formData.isDeal && formData.dealEndsAt ? formData.dealEndsAt : undefined
             };
 
+            console.log("Sending Payload:", JSON.stringify(payload, null, 2));
+
             await api.put(`/products/${id}`, payload);
+            alert("Product updated successfully!");
             router.push("/admin/products");
         } catch (error) {
-            console.error(error);
-            alert("Failed to update product");
+            console.error("Update failed:", error);
+            const msg = error.response?.data?.message || error.message || "Failed to update product";
+            alert(`Error: ${msg}`);
         } finally {
             setSubmitting(false);
         }
@@ -286,20 +342,42 @@ export default function EditProductPage({ params }) {
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
 
-                        <select
-                            name="category"
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none bg-white"
-                            value={formData.category}
-                            onChange={handleChange}
-                        >
-                            <option value="electronics">Electronics</option>
-                            <option value="jewelry">Jewelry</option>
-                            <option value="men's clothing">Men's Wearing</option>
-                            <option value="women's clothing">Women Wearing</option>
-                            <option value="Boutique">Boutique</option>
-                            <option value="others">Others</option>
-
-                        </select>
+                        {!isCustomCategory ? (
+                            <select
+                                name="categorySelect"
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none bg-white"
+                                value={categories.includes(formData.category) ? formData.category : "__NEW__"}
+                                onChange={handleChange}
+                            >
+                                <option value="" disabled>Select Category</option>
+                                {categories.map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                                <option value="__NEW__">+ Create New Category</option>
+                            </select>
+                        ) : (
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    name="category"
+                                    placeholder="Enter new category name"
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none"
+                                    value={formData.category}
+                                    onChange={handleChange}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsCustomCategory(false);
+                                        // Reset to first category if empty? Or keep as is?
+                                        if (!formData.category) setFormData(prev => ({ ...prev, category: categories[0] || "" }));
+                                    }}
+                                    className="px-3 py-2 text-gray-400 hover:text-gray-900"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        )}
                     </div>
                     <div className="flex items-center pt-8">
                         <label className="flex items-center cursor-pointer">
@@ -313,6 +391,113 @@ export default function EditProductPage({ params }) {
                             <span className="ml-2 text-sm text-gray-900 font-medium">Mark as Featured Product</span>
                         </label>
                     </div>
+                </div>
+
+                {/* Sale Configuration */}
+                <div className="p-6 bg-red-50 rounded-xl border border-red-100 space-y-6">
+                    <div className="flex items-center gap-2 mb-2">
+                        <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                            <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h3 className="text-sm font-bold text-red-900 uppercase tracking-wider">Sale & Offers</h3>
+                    </div>
+                    <div className="flex items-center">
+                        <label className="flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="isOnSale"
+                                className="w-5 h-5 text-red-600 bg-gray-800 border-gray-700 rounded focus:ring-red-500 cursor-pointer"
+                                checked={formData.isOnSale}
+                                onChange={handleChange}
+                            />
+                            <span className="ml-2 text-sm text-gray-900 font-medium">Put on Sale</span>
+                        </label>
+                    </div>
+
+                    {formData.isOnSale && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Sale Label</label>
+                                <input
+                                    type="text"
+                                    name="saleLabel"
+                                    placeholder="e.g. FLASH SALE, 50% OFF"
+                                    className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-red-500 outline-none"
+                                    value={formData.saleLabel}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Sale Ends At (Optional)</label>
+                                <input
+                                    type="datetime-local"
+                                    name="saleEndsAt"
+                                    className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-red-500 outline-none"
+                                    value={formData.saleEndsAt}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Deal Configuration */}
+                <div className="p-6 bg-yellow-50 rounded-xl border border-yellow-100 space-y-6">
+                    <div className="flex items-center gap-2 mb-2">
+                        <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <span className="text-yellow-700 font-bold">%</span>
+                        </div>
+                        <h3 className="text-sm font-bold text-yellow-900 uppercase tracking-wider">Deals & Special Offers</h3>
+                    </div>
+                    <div className="flex items-center">
+                        <label className="flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="isDeal"
+                                className="w-5 h-5 text-yellow-600 bg-gray-800 border-gray-700 rounded focus:ring-yellow-500 cursor-pointer"
+                                checked={formData.isDeal}
+                                onChange={handleChange}
+                            />
+                            <span className="ml-2 text-sm text-gray-900 font-medium">Mark as Deal</span>
+                        </label>
+                    </div>
+
+                    {formData.isDeal && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Deal Label</label>
+                                <input
+                                    type="text"
+                                    name="dealLabel"
+                                    placeholder="e.g. HOT DEAL, LIMITED"
+                                    className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-500 outline-none"
+                                    value={formData.dealLabel}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Deal Note</label>
+                                <input
+                                    type="text"
+                                    name="dealNote"
+                                    placeholder="e.g. Buy 2 get 1 Free"
+                                    className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-500 outline-none"
+                                    value={formData.dealNote}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Deal Ends At (Optional)</label>
+                                <input
+                                    type="datetime-local"
+                                    name="dealEndsAt"
+                                    className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-500 outline-none"
+                                    value={formData.dealEndsAt}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Boutique Specific Fields */}

@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "@/lib/api";
+import api from "@/lib/api";
 import { formatPKR } from "@/utils/currency";
+import FreeHomeDeliveryBanner from "@/components/FreeHomeDeliveryBanner";
 
 export default function OrderConfirmation() {
     const { id } = useParams();
@@ -59,6 +61,9 @@ export default function OrderConfirmation() {
                 </div>
 
                 <div className="border-t border-gray-100 py-6">
+                    <div className="mb-6">
+                        <FreeHomeDeliveryBanner />
+                    </div>
                     <div className="flex justify-between font-bold text-xl text-gray-900">
                         <span>Total</span>
                         <span>{formatPKR(order.totalAmount)}</span>

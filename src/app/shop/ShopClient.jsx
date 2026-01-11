@@ -9,21 +9,44 @@ import Skeleton from "@/components/ui/Skeleton";
 
 function ShopContent() {
     const [products, setProducts] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]); // Used for display
+    const [categories, setCategories] = useState(["All"]);
     const [loading, setLoading] = useState(true);
     const searchParams = useSearchParams();
     const categoryParam = searchParams.get("category");
     const [selectedCategory, setSelectedCategory] = useState(categoryParam || "All");
 
     useEffect(() => {
-        if (categoryParam) setSelectedCategory(categoryParam);
+        if (categoryParam) {
+            setSelectedCategory(categoryParam);
+        }
     }, [categoryParam]);
 
+    // Fetch Categories
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await api.get("/categories");
+                setCategories(["All", ...res.data]);
+            } catch (error) {
+                console.error("Failed to fetch categories", error);
+            }
+        };
+        fetchCategories();
+    }, []);
+
+    // Fetch Products (Server-Side Filtering)
     useEffect(() => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                const res = await api.get("/products");
+                const params = {};
+                if (selectedCategory !== "All") {
+                    params.category = selectedCategory;
+                }
+                const res = await api.get("/products", { params });
                 setProducts(res.data);
+                setFilteredProducts(res.data);
             } catch (error) {
                 console.error("Fetch shop products failed", error);
             } finally {
@@ -31,13 +54,7 @@ function ShopContent() {
             }
         };
         fetchProducts();
-    }, []);
-
-    const categories = ["All", ...new Set(products.map(p => p.category).filter(Boolean))];
-
-    const filteredProducts = selectedCategory === "All"
-        ? products
-        : products.filter(p => p.category === selectedCategory);
+    }, [selectedCategory]); // Re-run when category changes
 
     if (loading) {
         return (

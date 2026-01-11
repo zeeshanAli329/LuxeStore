@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import api from "@/lib/api";
 import { formatPKR } from "@/utils/currency";
+import { formatDateTime } from "@/utils/dateUtils";
+import { useRouter } from "next/navigation";
 import Hero from "@/components/Hero";
-import Testimonials from "@/components/Testimonials";
 import Newsletter from "@/components/Newsletter";
-import DealsSection from "@/components/DealsSection";
 import { ProductGridSkeleton } from "@/components/ui/Skeletons";
 import Skeleton from "@/components/ui/Skeleton";
+import SaleBanner from "@/components/SaleBanner";
 
 export default function HomeClient() {
     const [products, setProducts] = useState([]);
@@ -46,12 +47,20 @@ export default function HomeClient() {
         );
     }
 
-    const featuredProducts = products.filter(p => p.isFeatured).slice(0, 8);
-    const allCategories = [...new Set(products.map(p => p.category).filter(Boolean))];
+    // SEPARATE DEALS from other products
+    const dealProducts = products.filter(p => p.isDeal);
+    const regularProducts = products.filter(p => !p.isDeal);
+
+    // Derived lists from REGULAR products only (Deals excluded)
+    const featuredProducts = regularProducts.filter(p => p.isFeatured).slice(0, 8);
+    // Sale products (not deals)
+    const onSaleProducts = regularProducts.filter(p => p.isOnSale).slice(0, 8);
+
+    const allCategories = [...new Set(regularProducts.map(p => p.category).filter(Boolean))];
     const displayCategories = allCategories.slice(0, 4);
 
     const getCategoryImage = (cat) => {
-        const prod = products.find(p => p.category === cat);
+        const prod = regularProducts.find(p => p.category === cat);
         return prod ? prod.image : "https://placehold.co/400";
     };
 
@@ -59,6 +68,26 @@ export default function HomeClient() {
         <div className="bg-white">
             <Hero />
 
+            {/* DEALS SECTION (TOP) - Only if deals exist */}
+            {dealProducts.length > 0 && (
+                <>
+                    <SaleBanner deals={dealProducts} />
+                    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                            {dealProducts.slice(0, 8).map((product) => (
+                                <ProductCard key={product._id} product={product} />
+                            ))}
+                        </div>
+                        <div className="text-center mt-8">
+                            <Link href="/deals" className="text-blue-600 font-semibold hover:text-blue-800">
+                                View All Deals &rarr;
+                            </Link>
+                        </div>
+                    </section>
+                </>
+            )}
+
+            {/* CATEGORIES SECTION */}
             {displayCategories.length > 0 && (
                 <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Shop by Category</h2>
@@ -82,6 +111,28 @@ export default function HomeClient() {
                 </section>
             )}
 
+            {/* ON SALE SECTION (Regular Sales Only) */}
+            {onSaleProducts.length > 0 && (
+                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 border-b border-gray-100">
+                    <div className="flex justify-between items-center mb-6">
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-8 bg-red-600 rounded-full"></span>
+                            <h2 className="text-2xl font-bold text-gray-900 uppercase tracking-wide">On Sale</h2>
+                        </div>
+                        <Link href="/sale" className="text-red-600 font-bold hover:text-red-700 flex items-center gap-1 group">
+                            View All Offers
+                            <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                        </Link>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                        {onSaleProducts.map((product) => (
+                            <ProductCard key={product._id} product={product} />
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {/* FEATURED SECTION */}
             {featuredProducts.length > 0 && (
                 <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-gray-50">
                     <h2 className="text-3xl font-extrabold text-gray-900 mb-8 text-center uppercase tracking-wide">Featured Products</h2>
@@ -93,6 +144,7 @@ export default function HomeClient() {
                 </section>
             )}
 
+            {/* ALL PRODUCTS (Excluding Deals) */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="flex justify-between items-end mb-8">
                     <h2 className="text-3xl font-bold text-gray-900">All Products</h2>
@@ -102,7 +154,7 @@ export default function HomeClient() {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
-                    {products.slice(0, 20).map((product) => (
+                    {regularProducts.slice(0, 20).map((product) => (
                         <ProductCard key={product._id} product={product} showCategory={false} />
                     ))}
                 </div>
@@ -113,10 +165,7 @@ export default function HomeClient() {
                     </Link>
                 </div>
             </section>
-            <DealsSection />
 
-
-            <Testimonials />
             <Newsletter />
         </div>
     );
@@ -126,18 +175,28 @@ function ProductCard({ product, showCategory = false }) {
     if (!product) return null;
 
     return (
-        <Link href={`/product/${product._id}`} className="group block w-full h-full cursor-pointer bg-white rounded-xl border border-gray-100 hover:shadow-xl transition-shadow flex flex-col">
-            <div className="w-full h-48 bg-gray-200 relative rounded-t-xl">
+        <Link href={`/product/${product._id}`} className="group block w-full h-full cursor-pointer bg-white rounded-xl border border-gray-100 hover:shadow-xl transition-shadow flex flex-col relative">
+            <div className="w-full h-48 bg-gray-200 relative rounded-t-xl overflow-hidden">
                 <img
                     src={product.image}
                     alt={product.title}
-                    className="w-full h-full object-center object-cover rounded-t-xl  transition-transform duration-300"
+                    className="w-full h-full object-center object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-110"
                 />
-                {product.discount > 0 && (
-                    <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded z-10">
-                        -{product.discount}%
-                    </span>
-                )}
+
+                {/* Badges Stack - NO DEAL BADGE */}
+                <div className="absolute top-2 left-2 z-10 flex flex-col gap-1 items-start">
+                    {product.isOnSale && (
+                        <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase tracking-wide">
+                            {product.saleLabel || "SALE"}
+                        </span>
+                    )}
+                    {!product.isOnSale && !product.isDeal && product.discount > 0 && (
+                        <span className="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
+                            -{product.discount}%
+                        </span>
+                    )}
+                </div>
+
                 {product.stock === 0 ? (
                     <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-20">
                         <span className="bg-gray-900 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Out of Stock</span>
@@ -149,11 +208,22 @@ function ProductCard({ product, showCategory = false }) {
                 ) : null}
             </div>
 
-            <div className="p-4 flex flex-col justify-between">
+            <div className="p-4 flex flex-col justify-between flex-1">
                 <div>
-                    <h3 className="text-sm text-gray-700 font-medium line-clamp-1">{product.title}</h3>
+                    <h3 className="text-sm text-gray-700 font-medium line-clamp-1 group-hover:text-gray-900">{product.title}</h3>
                     {showCategory && <p className="mt-1 text-xs text-gray-500 capitalize">{product.category}</p>}
                 </div>
+
+                {/* End Time Displays - No Deal Timer on Card, only Sale */}
+                {(product.isOnSale && product.saleEndsAt) ? (
+                    <div className="mt-2 text-[10px] text-gray-500">
+                        {product.isOnSale && product.saleEndsAt ? (
+                            <p className="text-red-500 font-medium">Sale ends: {formatDateTime(product.saleEndsAt)}</p>
+                        ) : null}
+                    </div>
+                ) : null}
+
+
                 <div className="flex items-center justify-between mt-3">
                     <div className="flex flex-col">
                         <p className="text-lg font-bold text-gray-900">{formatPKR(product.newPrice || product.price)}</p>

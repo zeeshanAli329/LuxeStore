@@ -10,6 +10,8 @@ import ProductGallery from "@/components/ProductGallery";
 import BoutiqueBookingModal from "./BoutiqueBookingModal";
 import { getProducts } from "../../services/productService";
 import { formatPKR } from "@/utils/currency";
+import { formatDateTime } from "@/utils/dateUtils";
+import FreeHomeDeliveryBanner from "@/components/FreeHomeDeliveryBanner";
 
 
 export default function DetailsPage({ id }) {
@@ -102,13 +104,26 @@ export default function DetailsPage({ id }) {
                     <span className="mx-1">/</span>
                     <span className="text-gray-900 font-medium truncate block min-w-0 flex-1">{product.title}</span>
                 </nav>
+                <div className="mb-4">
+                    <FreeHomeDeliveryBanner />
+                </div>
 
                 {/* Product Details Section */}
                 <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-4 p-0 md:p-6">
                         {/* Image Column */}
                         <div className="relative p-0 md:p-0">
-                            {product.discount > 0 && (
+                            {product.isDeal && (
+                                <span className="absolute top-2 left-2 z-10 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded shadow-md uppercase tracking-wide">
+                                    {product.dealLabel || "DEAL"}
+                                </span>
+                            )}
+                            {product.isOnSale && (
+                                <span className={`absolute ${product.isDeal ? 'top-10' : 'top-2'} left-2 z-10 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md uppercase tracking-wide`}>
+                                    {product.saleLabel || "SALE"}
+                                </span>
+                            )}
+                            {!product.isOnSale && !product.isDeal && product.discount > 0 && (
                                 <span className="absolute top-2 left-2 z-10 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-md">
                                     -{product.discount}%
                                 </span>
@@ -142,6 +157,27 @@ export default function DetailsPage({ id }) {
                                     </p>
                                 )}
                             </div>
+
+                            {/* Deal & Sale Info */}
+                            {(product.dealNote || (product.isDeal && product.dealEndsAt) || (product.isOnSale && product.saleEndsAt)) && (
+                                <div className="mb-4 bg-gray-50 border border-gray-100 rounded-lg p-3">
+                                    {product.dealNote && (
+                                        <p className="text-sm font-semibold text-yellow-800 mb-1">
+                                            🌟 {product.dealNote}
+                                        </p>
+                                    )}
+                                    {product.isDeal && product.dealEndsAt && (
+                                        <p className="text-xs font-medium text-gray-500">
+                                            Deal ends: <span className="text-yellow-700">{formatDateTime(product.dealEndsAt)}</span>
+                                        </p>
+                                    )}
+                                    {product.isOnSale && product.saleEndsAt && !product.isDeal && (
+                                        <p className="text-xs font-medium text-gray-500">
+                                            Sale ends: <span className="text-red-600">{formatDateTime(product.saleEndsAt)}</span>
+                                        </p>
+                                    )}
+                                </div>
+                            )}
 
                             <p className="text-gray-600 text-xs leading-relaxed mb-3 border-b border-gray-100 pb-3">
                                 {product.description}

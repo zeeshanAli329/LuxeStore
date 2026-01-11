@@ -116,25 +116,15 @@ export default function CheckoutClient() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">City (Optional)</label>
                                 <input
                                     type="text"
-                                    required
                                     className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                                     value={city}
                                     onChange={(e) => setCity(e.target.value)}
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                    value={zip}
-                                    onChange={(e) => setZip(e.target.value)}
-                                />
-                            </div>
+                            {/* Postal Code Removed */}
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number (Required)</label>
                                 <input
