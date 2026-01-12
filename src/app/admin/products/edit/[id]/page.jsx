@@ -35,7 +35,10 @@ export default function EditProductPage({ params }) {
         isDeal: false,
         dealLabel: "",
         dealNote: "",
-        dealEndsAt: ""
+        dealLabel: "",
+        dealNote: "",
+        dealEndsAt: "",
+        ctaType: "BUY_NOW"
     });
 
     const [categories, setCategories] = useState([]);
@@ -93,8 +96,11 @@ export default function EditProductPage({ params }) {
                     isDeal: p.isDeal || false,
                     dealLabel: p.dealLabel || "",
                     dealNote: p.dealNote || "",
-                    dealEndsAt: p.dealEndsAt ? new Date(p.dealEndsAt).toISOString().slice(0, 16) : ""
+                    dealNote: p.dealNote || "",
+                    dealEndsAt: p.dealEndsAt ? new Date(p.dealEndsAt).toISOString().slice(0, 16) : "",
+                    ctaType: p.ctaType || (p.category === "Boutique" || p.isBoutique ? "BOOK_NOW" : "BUY_NOW")
                 });
+                console.log("EDIT PRODUCT fetched:", p);
 
             } catch (error) {
                 console.error("Failed to fetch product", error);
@@ -155,8 +161,10 @@ export default function EditProductPage({ params }) {
                 isDeal: formData.isDeal,
                 dealLabel: formData.isDeal ? formData.dealLabel : undefined,
                 dealNote: formData.isDeal ? formData.dealNote : undefined,
-                dealEndsAt: formData.isDeal && formData.dealEndsAt ? formData.dealEndsAt : undefined
+                dealEndsAt: formData.isDeal && formData.dealEndsAt ? formData.dealEndsAt : undefined,
+                ctaType: formData.ctaType || "BUY_NOW"
             };
+            console.log("EDIT PRODUCT submit payload ctaType:", payload.ctaType);
 
             console.log("Sending Payload:", JSON.stringify(payload, null, 2));
 
@@ -201,6 +209,22 @@ export default function EditProductPage({ params }) {
                             value={formData.title}
                             onChange={handleChange}
                         />
+                    </div>
+
+                    <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Button Type (CTA)</label>
+                        <select
+                            name="ctaType"
+                            className="w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-blue-50/50 text-gray-900 font-medium"
+                            value={formData.ctaType || "BUY_NOW"}
+                            onChange={handleChange}
+                        >
+                            <option value="BUY_NOW">Buy Now (Standard Cart)</option>
+                            <option value="BOOK_NOW">Book Now (Appointment/Booking)</option>
+                        </select>
+                        <p className="text-xs text-blue-600 mt-1">
+                            Use "Book Now" for items requiring appointments (e.g. Bridal).
+                        </p>
                     </div>
 
                     <div className="md:col-span-2">

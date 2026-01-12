@@ -76,6 +76,11 @@ const productSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        ctaType: {
+            type: String,
+            enum: ["BUY_NOW", "BOOK_NOW"], // Determines if "Buy Now" or "Book Now" is shown
+            default: "BUY_NOW",
+        },
         designTimeMinDays: {
             type: Number,
         },

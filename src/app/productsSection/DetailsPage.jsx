@@ -295,7 +295,7 @@ export default function DetailsPage({ id }) {
                             )}
 
                             <div className="flex gap-3 flex-col sm:flex-row">
-                                {(product.category === "Boutique" || product.isBoutique) ? (
+                                {(product.ctaType === "BOOK_NOW" || (!product.ctaType && (product.category === "Boutique" || product.isBoutique))) ? (
                                     (() => {
                                         const hasLocation = Boolean(
                                             (product.visitLocationText && product.visitLocationText.trim()) ||

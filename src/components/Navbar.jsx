@@ -68,7 +68,7 @@ export default function Navbar() {
 
                     {/* Tablet Navigation (Visible md-lg) */}
                     <div className="hidden md:flex space-x-6 items-center">
-                        {["Home", "Sale", "Shop", "Boutique", "Categories", "About", "Contact"].map((item) => (
+                        {["Home", "Sale", "Shop", "Categories", "About", "Contact"].map((item) => (
                             <Link
                                 key={item}
                                 href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
@@ -174,10 +174,7 @@ export default function Navbar() {
                             Shop
                             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
                         </Link>
-                        <Link href="/boutique" className="text-gray-700 hover:text-blue-600 font-medium transition-all duration-200 text-sm uppercase tracking-wide relative group py-2">
-                            Boutique
-                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
-                        </Link>
+
 
                         {/* Categories Dropdown */}
                         <div
@@ -362,7 +359,7 @@ export default function Navbar() {
                                 <Link href="/" className="block px-4 py-3 rounded-lg text-lg font-medium text-gray-800 hover:text-blue-600 hover:bg-blue-50 transition-colors border-b border-gray-50" onClick={handleMenuClose}>Home</Link>
                                 <Link href="/sale" className="block px-4 py-3 rounded-lg text-lg font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors border-b border-gray-50" onClick={handleMenuClose}>Sale</Link>
                                 <Link href="/shop" className="block px-4 py-3 rounded-lg text-lg font-medium text-gray-800 hover:text-blue-600 hover:bg-blue-50 transition-colors border-b border-gray-50" onClick={handleMenuClose}>Shop</Link>
-                                <Link href="/boutique" className="block px-4 py-3 rounded-lg text-lg font-medium text-gray-800 hover:text-blue-600 hover:bg-blue-50 transition-colors border-b border-gray-50" onClick={handleMenuClose}>Boutique</Link>
+                                {/* <Link href="/boutique" className="block px-4 py-3 rounded-lg text-lg font-medium text-gray-800 hover:text-blue-600 hover:bg-blue-50 transition-colors border-b border-gray-50" onClick={handleMenuClose}>Boutique</Link> */}
 
                                 {/* Mobile Categories */}
                                 <div className="border-b border-gray-50 pb-2">

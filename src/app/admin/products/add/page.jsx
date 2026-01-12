@@ -17,6 +17,7 @@ export default function AddProductPage() {
         category: "electronics",
         stock: 10,
         isFeatured: false,
+        ctaType: "BUY_NOW",
         colors: "", // Comma separated
         sizes: "",   // Comma separated
         images: "",  // Comma separated
@@ -94,6 +95,7 @@ export default function AddProductPage() {
                 visitLocationText: formData.category === "Boutique" ? formData.visitLocationText : undefined,
                 visitLocationMapUrl: formData.category === "Boutique" ? formData.visitLocationMapUrl : undefined,
                 isBoutique: formData.category === "Boutique",
+                ctaType: formData.ctaType,
                 isOnSale: formData.isOnSale,
                 saleLabel: formData.isOnSale ? formData.saleLabel : undefined,
                 saleEndsAt: formData.isOnSale && formData.saleEndsAt ? formData.saleEndsAt : undefined,
@@ -324,6 +326,22 @@ export default function AddProductPage() {
                             </div>
                         )}
                     </div>
+
+                    {/* Button Type Selector */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Button Type</label>
+                        <select
+                            name="ctaType"
+                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer"
+                            value={formData.ctaType}
+                            onChange={handleChange}
+                        >
+                            <option value="BUY_NOW">Buy Now</option>
+                            <option value="BOOK_NOW">Book Now</option>
+                        </select>
+                        <p className="text-xs text-gray-400 mt-1">Controls the main action button on detail page</p>
+                    </div>
+
                     <div className="flex items-center pt-8">
                         <label className="flex items-center cursor-pointer">
                             <input

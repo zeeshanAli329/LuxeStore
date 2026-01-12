@@ -46,7 +46,7 @@ const getProductById = async (req, res) => {
 // CREATE PRODUCT (ADMIN)
 const createProduct = async (req, res) => {
     try {
-        const { title, description, image, images, video, oldPrice, newPrice, discount, category, stock, isFeatured, colors, sizes, isBoutique, designTimeMinDays, designTimeMaxDays, visitLocationText, visitLocationMapUrl, isOnSale, saleLabel, saleEndsAt, isDeal, dealLabel, dealEndsAt, dealNote } = req.body;
+        const { title, description, image, images, video, oldPrice, newPrice, discount, category, stock, isFeatured, colors, sizes, isBoutique, ctaType, designTimeMinDays, designTimeMaxDays, visitLocationText, visitLocationMapUrl, isOnSale, saleLabel, saleEndsAt, isDeal, dealLabel, dealEndsAt, dealNote } = req.body;
 
         // Calculate discount if not provided but old/new prices are
         let finalDiscount = discount;
@@ -69,6 +69,7 @@ const createProduct = async (req, res) => {
             colors: colors || [],
             sizes: sizes || [],
             isBoutique: isBoutique || false,
+            ctaType: ctaType || "BUY_NOW",
             designTimeMinDays,
             designTimeMaxDays,
             visitLocationText,
@@ -113,7 +114,7 @@ const updateProduct = async (req, res) => {
         const allowedFields = [
             'title', 'description', 'image', 'images', 'video',
             'oldPrice', 'newPrice', 'discount', 'category', 'stock',
-            'isFeatured', 'isBoutique', 'colors', 'sizes',
+            'isFeatured', 'isBoutique', 'ctaType', 'colors', 'sizes',
             'designTimeMinDays', 'designTimeMaxDays',
             'visitLocationText', 'visitLocationMapUrl',
             'isOnSale', 'saleLabel', 'saleEndsAt',
