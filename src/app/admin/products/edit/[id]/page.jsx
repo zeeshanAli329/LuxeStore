@@ -308,11 +308,13 @@ export default function EditProductPage({ params }) {
                     </div>
                     {formData.category !== "Boutique" && (
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Stock {formData.ctaType === "BUY_NOW" && <span className="text-red-500">*</span>}
+                            </label>
                             <input
                                 type="number"
                                 name="stock"
-                                required
+                                required={formData.category !== "Boutique" && formData.ctaType === "BUY_NOW"}
                                 min="0"
                                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none"
                                 value={formData.stock}

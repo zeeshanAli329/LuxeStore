@@ -32,6 +32,9 @@ const productSchema = new mongoose.Schema(
         },
         stock: {
             type: Number,
+            required: function () {
+                return this.ctaType === "BUY_NOW";
+            },
             default: 0,
         },
 
