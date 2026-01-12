@@ -77,7 +77,14 @@ export default function Favorites() {
                                     </Link>
 
                                     <div className="mt-auto pt-3 border-t border-gray-50 flex items-center justify-between">
-                                        <span className="text-lg font-bold text-gray-900">${product.price.toFixed(2)}</span>
+                                        {(() => {
+                                            const displayPrice = product.newPrice ?? product.oldPrice;
+                                            return displayPrice ? (
+                                                <span className="text-lg font-bold text-gray-900">Rs {displayPrice.toLocaleString()}</span>
+                                            ) : (
+                                                <span className="text-sm font-medium text-gray-500">Price on request</span>
+                                            );
+                                        })()}
                                         <Link
                                             href={`/product/${product._id}`}
                                             className="text-sm font-medium text-blue-600 hover:text-blue-700"
