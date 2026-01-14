@@ -1,10 +1,11 @@
 
-export const COMPANY_NAME = "LuxeStore";
+export const COMPANY_NAME = "Dormex";
 
-export const LOGO = "/logo.png";
+export const LOGO = "/dormex-logo.png";
 
-export const ALT = "LuxeStore"
-
+// export const LOGO = "/logo.png";
+export const ALT = "Dormex"
+export const FT_LOGO = "/ft-logo.png";
 
 
 
