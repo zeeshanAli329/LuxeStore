@@ -145,7 +145,7 @@ export default function Footer() {
 
                 <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-center items-center">
                     <p className="text-gray-500 text-sm mb-4 md:mb-0">
-                        &copy; 2025 LuxeStore. All rights reserved.
+                        &copy; 2025 DORMEX. All rights reserved.
                     </p>
                 </div>
             </div>
