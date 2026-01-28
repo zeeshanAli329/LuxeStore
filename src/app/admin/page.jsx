@@ -50,7 +50,7 @@ export default function AdminDashboard() {
         fetchData();
     }, []);
 
-    if (loading) return <div className="text-center py-10">Loading dashboard...</div>;
+    // if (loading) return <div className="text-center py-10">Loading dashboard...</div>;
 
     return (
         <div className="space-y-8">

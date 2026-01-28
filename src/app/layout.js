@@ -83,6 +83,7 @@ export const metadata = {
 };
 
 import WhatsAppButton from "@/components/WhatsAppButton";
+import ComingSoonPage from "./coming-soon/page";
 
 export default function RootLayout({ children }) {
   return (
@@ -90,12 +91,13 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <StoreProvider>
+        {/* <StoreProvider>
           <ClientLayout>
             {children}
             <WhatsAppButton />
           </ClientLayout>
-        </StoreProvider>
+        </StoreProvider> */}
+        <ComingSoonPage />
       </body>
     </html>
   );
